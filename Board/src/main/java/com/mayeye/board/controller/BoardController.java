@@ -10,16 +10,23 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.service.BoardService;
 
 @Controller
+@SessionAttributes({"boardDTO", "usersDTO"})
 public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
+	
+	@RequestMapping(value="/login")
+	public String login(Model model) {
+		return null;
+	}
 	
 	@RequestMapping(value="/boardList")
 	public String boardList(Model model) {
@@ -80,4 +87,27 @@ public class BoardController {
 		}
 	}
 	
+	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.GET)
+	public String boardEdit(@PathVariable int num, Model model) {
+		BoardDTO boardDTO = boardService.read(num);
+		model.addAttribute("boardDTO", boardDTO);
+		return "boardEdit";
+	}
+	
+	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)
+	public String boardEdit(@Valid @ModelAttribute BoardDTO boardDTO, BindingResult bindingResult, SessionStatus sessionStatus) {
+		if(bindingResult.hasErrors()) {
+			return "boardEdit";
+		} else {
+			boardService.edit(boardDTO);
+			return "redirect:/boardList";
+		} /* if(boardVO.getPassword() == pwd) {
+			boardService.deit(boardDTO);
+			sessionStatus.setComplete();
+			return "redirect:/boardList";
+		} */
+		
+		// model.addAttribute("msg", "비밀번호가 일치하지 않습니다.");
+		// return "boardEdit";
+	}
 }

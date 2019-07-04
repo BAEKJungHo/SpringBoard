@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 수정 -->
 	<update id="update" parameterType="boardDTO">
 		update b_board set title = #{title},
-		contents = #{contents},
+		contents = #{contents}
 		where num = #{num}
 	</update>
 	
