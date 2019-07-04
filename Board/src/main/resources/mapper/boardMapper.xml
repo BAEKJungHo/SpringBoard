@@ -11,15 +11,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by date
 	</select>
 	
-	<!-- 검색 -->
+	<!-- 해당 게시글 보기 -->
 	<select id="select" parameterType="int" resultType="boardDTO">
 		select * from b_board
-		where title = '%#{title}%'
+		where num = #{num}
 	</select>
 	
 	<!-- 삽입 -->
 	<insert id="insert" parameterType="boardDTO">
-		insert into b_board (title, contents) values(#{title},#{content}) 
+		insert into b_board (title, contents) values(#{title},#{contents}) 
 	</insert>
 	
 	<!-- 수정 -->
@@ -32,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 조회수 증가 -->
 	<update id="updateCount" parameterType="int">
 		update b_board set
-		count = count + 1
+		count=count+1
 		where num = #{num}
 	</update>
 	

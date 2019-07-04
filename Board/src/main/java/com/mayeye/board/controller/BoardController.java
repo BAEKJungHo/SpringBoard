@@ -27,7 +27,7 @@ public class BoardController {
 		return "boardList";
 	}
 	
-	@RequestMapping(value="/boardRead")
+	@RequestMapping(value="/boardRead/{num}")
 	public String boardRead(Model model, @PathVariable int num) {
 		model.addAttribute("boardDTO", boardService.read(num));
 		return "boardRead";

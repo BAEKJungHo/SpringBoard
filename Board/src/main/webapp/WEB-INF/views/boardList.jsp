@@ -23,7 +23,7 @@
 		</tr>
 	</c:forEach>
 	</table>
-	<a href="<c:url value="/write" />">글쓰기</a>
+	<a href="<c:url value="/boardWrite" />">글쓰기</a>
 
 </body>
 </html>
