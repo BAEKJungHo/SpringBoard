@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="boardDAO">
+	<!-- 게시판 목록 -->
+	<select id="list" resultType="boardDTO">
+		select * from b_board 
+		order by date
+	</select>
+	
+	<!-- 검색 -->
+	<select id="select" parameterType="int" resultType="boardDTO">
+		select * from b_board
+		where title = '%#{title}%'
+	</select>
+	
+	<!-- 삽입 -->
+	<insert id="insert" parameterType="boardDTO">
+		insert into b_board (title, contents) values(#{title},#{content}) 
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="update" parameterType="boardDTO">
+		update b_board set title = #{title},
+		contents = #{contents},
+		where num = #{num}
+	</update>
+	
+	<!-- 조회수 증가 -->
+	<update id="updateCount" parameterType="int">
+		update b_board set
+		count = count + 1
+		where num = #{num}
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="delete" parameterType="boardDTO">
+		delete from b_board
+		where num = #{num}
+	</delete>
+	
+</mapper>
