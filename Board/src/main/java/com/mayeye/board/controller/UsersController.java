@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -37,21 +38,24 @@ public class UsersController {
 	
 	// 로그인 처리 : HttpSession을 사용 
 	@RequestMapping(value="/login", method = RequestMethod.POST)
-	public String login(UsersDTO usersDTO, HttpSession session, RedirectAttributes rttr) {
-		Logger.debug("UsersDTO" + usersDTO);
-		Logger.debug("Id : " + usersDTO.getId());
-		Logger.debug("pwd : " + usersDTO.getPwd());
-		
+	public String login(UsersDTO usersDTO, HttpSession session, RedirectAttributes rttr, Model model) {
+		// 비밀번호 처리 
+		boolean flag = usersService.checkPw(usersDTO.getId(), usersDTO.getPwd());
 		UsersDTO user = usersService.select(usersDTO);
 		session.setAttribute("user", user);
-		
 		if(user == null) {
 			session.setAttribute("user", null);
-			rttr.addFlashAttribute("msg", false);
+			rttr.addFlashAttribute("msg", "로그인에 실패하였습니다");
 			return "redirect:/login";
 		} else {
-			session.setAttribute("user", user);
-			return "boardList";
+			if(flag) {
+				session.setAttribute("user", user);
+				session.setAttribute("id", user.getId());
+				return "redirect:/boardList";
+			} else {
+				rttr.addFlashAttribute("msg", "비밀번호가 틀렸습니다");
+				return "redirect:/login";
+			}
 		}
 	} 
 	

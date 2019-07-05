@@ -13,6 +13,7 @@ public class BoardDTO {
 	private String date; // 날짜
 	@NotEmpty(message="내용을 입력하세요.")
 	private String contents; // 내용
+	private String id;
 	
 	public int getNum() {
 		return num;
@@ -51,9 +52,16 @@ public class BoardDTO {
 	public void setContents(String contents) {
 		this.contents = contents;
 	}
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	@Override
 	public String toString() {
 		return "BoardDTO [num=" + num + ", title=" + title + ", count=" + count + ", name=" + name + ", date=" + date
-				+ ", contents=" + contents + "]";
+				+ ", contents=" + contents + ", id=" + id + "]";
 	}
 }

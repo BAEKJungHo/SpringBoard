@@ -10,4 +10,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select * from b_users
 		where id like #{id}
 	</select>
+	
+	<!-- 비밀번호 체크 -->
+	<select id="checkPw" resultType="int">
+		select count(*) from b_users
+		where id like #{id} and pwd like #{pwd} 
+	</select>
 </mapper>

@@ -45,12 +45,8 @@
 		<input type="reset" value="취소">
 	</form:form>
 	
-	<c:if test="${msg eq false}">
-		<p style="color:#f00;"> 로그인에 실패 하였습니다. </p>
-	</c:if>
-	
-	<c:if test="${user ne null}">
-		<p>${user.name} 님 환영합니다.</p>
+	<c:if test="${msg ne null}">
+		<p style="color:#f00;">${msg}</p>
 	</c:if>
 </body>
 </html>

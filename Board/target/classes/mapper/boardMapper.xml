@@ -7,10 +7,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="boardDAO">
 	<!-- 게시판 목록 -->
 	<select id="list" resultType="boardDTO">
-		select b.num, b.title, u.name, b.date, b.count 
+		select b.num, b.title, u.name, b.date, b.count, b.id 
 		from b_board as b
 		inner join b_users as u
-		order by date
+		where b.id = u.id
+		order by num
 	</select>
 	
 	<!-- 해당 게시글 보기 -->

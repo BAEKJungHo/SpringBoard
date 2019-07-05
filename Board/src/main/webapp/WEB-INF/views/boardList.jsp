@@ -28,6 +28,8 @@
 	</c:forEach>
 	</table>
 	<a href="<c:url value="/boardWrite" />">글쓰기</a>
-
+	<c:if test="${msg ne null}">
+		<p style="color:#f00;">${msg}</p>
+	</c:if>
 </body>
 </html>

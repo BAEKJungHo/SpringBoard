@@ -25,4 +25,9 @@ public class UsersServiceImpl implements UsersService{
 		return usersDAO.select(usersDTO);
 	}
 
+	@Override
+	public boolean checkPw(String id, String pwd) {
+		return usersDAO.checkPw(id, pwd);
+	}
+
 }
