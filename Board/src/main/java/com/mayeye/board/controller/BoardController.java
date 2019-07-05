@@ -27,9 +27,15 @@ public class BoardController {
 	// 게시판 목록
 	@RequestMapping(value="/boardList")
 	public String boardList(Model model, HttpSession session) {
-		model.addAttribute("boardList", boardService.list());
-		model.addAttribute("user", session.getAttribute("user"));
-		return "boardList";
+		if(session.getAttribute("id") == null) {
+			model.addAttribute("msg", "잘못된 접근입니다!!");
+			model.addAttribute("url", "login");
+			return "redirect";
+		} else {
+			model.addAttribute("boardList", boardService.list());
+			model.addAttribute("user", session.getAttribute("user"));
+			return "boardList";
+		}
 	}
 	
 	// 게시글 상세 내역

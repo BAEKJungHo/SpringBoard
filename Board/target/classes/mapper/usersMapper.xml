@@ -8,12 +8,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 사용자 정보 조회 -->
 	<select id="select" parameterType="String" resultType="usersDto">
 		select * from b_users
-		where id like #{id}
+		where id = #{id}
 	</select>
 	
 	<!-- 비밀번호 체크 -->
 	<select id="checkPw" resultType="int">
 		select count(*) from b_users
-		where id like #{id} and pwd like #{pwd} 
+		where id = #{id} and pwd = #{pwd} 
 	</select>
 </mapper>

@@ -11,7 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from b_board as b
 		inner join b_users as u
 		where b.id = u.id
-		order by num
+		order by num desc
 	</select>
 	
 	<!-- 해당 게시글 보기 -->

@@ -41,22 +41,17 @@ public class UsersController {
 	public String login(UsersDTO usersDTO, HttpSession session, RedirectAttributes rttr, Model model) {
 		// 비밀번호 처리 
 		boolean flag = usersService.checkPw(usersDTO.getId(), usersDTO.getPwd());
-		UsersDTO user = usersService.select(usersDTO);
-		session.setAttribute("user", user);
-		if(user == null) {
-			session.setAttribute("user", null);
-			rttr.addFlashAttribute("msg", "로그인에 실패하였습니다");
-			return "redirect:/login";
+
+		if(flag) {
+			UsersDTO user = usersService.select(usersDTO);
+			session.setAttribute("user", user);
+			session.setAttribute("id", user.getId());
+			return "redirect:/boardList";
 		} else {
-			if(flag) {
-				session.setAttribute("user", user);
-				session.setAttribute("id", user.getId());
-				return "redirect:/boardList";
-			} else {
-				rttr.addFlashAttribute("msg", "비밀번호가 틀렸습니다");
-				return "redirect:/login";
-			}
+			rttr.addFlashAttribute("msg", "아이디 또는 비밀번호가 틀렸습니다");
+			return "redirect:/login";
 		}
+		
 	} 
 	
 	// 로그아웃 처리 : invalidate() 사용 
