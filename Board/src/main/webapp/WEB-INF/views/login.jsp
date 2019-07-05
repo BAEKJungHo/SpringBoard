@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,13 +32,25 @@
 	<center><br>
 	<h3>Users Login</h3><br>
 	<hr>
-	<form name="loginForm" action="/login" method=post>
-		<label><span>ID:</span>
-			<input type="text" name="id" size="10"></label>
-		<label><span>Password:</span>
-			<input type="password" name="pwd" size="10"></label><br>
-		<input type="submit" value="로그인" name="B1">&nbsp;&nbsp;
-		<input type="reset" value="취소" name="B2">
-	</form>
+	<form:form commandName="usersDTO" mehtod="post">
+		<form:label path="id"><span>ID:</span>
+			<form:input path="id" />
+			<form:errors path="id" />
+		</form:label>
+		<form:label path="pwd"><span>Password:</span>
+			<form:input path="pwd" />
+			<form:errors path="pwd" />
+			</form:label><br>
+		<input type="submit" value="로그인">&nbsp;&nbsp;
+		<input type="reset" value="취소">
+	</form:form>
+	
+	<c:if test="${msg eq false}">
+		<p style="color:#f00;"> 로그인에 실패 하였습니다. </p>
+	</c:if>
+	
+	<c:if test="${user ne null}">
+		<p>${user.name} 님 환영합니다.</p>
+	</c:if>
 </body>
 </html>

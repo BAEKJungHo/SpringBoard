@@ -10,6 +10,7 @@
 	
 	<typeAliases>
 		<typeAlias alias="boardDto" type="com.mayeye.board.dto.BoardDTO"/>
+		<typeAlias alias="usersDto" type="com.mayeye.board.dto.UsersDTO"/>
 	</typeAliases>
 
 </configuration>

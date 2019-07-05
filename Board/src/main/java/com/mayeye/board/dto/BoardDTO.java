@@ -9,6 +9,7 @@ public class BoardDTO {
 	@Length(min=2, max=20, message="제목은 2자 이상, 20자 이하 입력하세요.")
 	private String title; // 제목
 	private int count; // 조회수
+	private String name; // 작성자
 	private String date; // 날짜
 	@NotEmpty(message="내용을 입력하세요.")
 	private String contents; // 내용
@@ -31,6 +32,13 @@ public class BoardDTO {
 	public void setCount(int count) {
 		this.count = count;
 	}
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public String getDate() {
 		return date;
 	}
@@ -45,7 +53,7 @@ public class BoardDTO {
 	}
 	@Override
 	public String toString() {
-		return "BoardDTO [num=" + num + ", title=" + title + ", count=" + count + ", date=" + date + ", contents="
-				+ contents + "]";
+		return "BoardDTO [num=" + num + ", title=" + title + ", count=" + count + ", name=" + name + ", date=" + date
+				+ ", contents=" + contents + "]";
 	}
 }

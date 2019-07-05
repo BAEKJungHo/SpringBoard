@@ -4,6 +4,6 @@ import com.mayeye.board.dto.UsersDTO;
 
 public interface UsersDAO {
 	
-	public UsersDTO select(String id);
+	public UsersDTO select(UsersDTO usersDTO);
 
 }

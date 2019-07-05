@@ -12,6 +12,7 @@
 </head>
 <body>
 <!-- 변경 코드 -->
+	<c:if test="${msg eq null}" >
 	<form:form commandName="boardDTO" mehtod="post">
 		<table border="1">
 			<tr>
@@ -34,6 +35,12 @@
 			<a href="<c:url value="/boardList" />"> 목록</a>
 		</div>
 	</form:form>
+	</c:if>
+	
+	<c:if test="${msg eq falase}" >
+		<p> 로그인을 해주세요 </p>
+		<p><a href="<c:url value="/login" />">로그인</a>
+	</c:if>
 <!-- 기존 코드 -->
 <%-- 	<form action="<c:url value="/board/write" />" method="POST">
 		<table border="1">

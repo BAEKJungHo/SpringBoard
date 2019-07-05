@@ -7,7 +7,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="boardDAO">
 	<!-- 게시판 목록 -->
 	<select id="list" resultType="boardDTO">
-		select * from b_board 
+		select b.num, b.title, u.name, b.date, b.count 
+		from b_board as b
+		inner join b_users as u
 		order by date
 	</select>
 	
@@ -19,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 삽입 -->
 	<insert id="insert" parameterType="boardDTO">
-		insert into b_board (title, contents) values(#{title},#{contents}) 
+		insert into b_board (title, contents, id) values(#{title},#{contents},#{id}) 
 	</insert>
 	
 	<!-- 수정 -->

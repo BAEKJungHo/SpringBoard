@@ -13,8 +13,8 @@ public class UsersDAOImpl implements UsersDAO {
 	private SqlSessionTemplate sqlSessionTemplate;
 
 	@Override
-	public UsersDTO select(String id) {
-		UsersDTO dto = (UsersDTO)sqlSessionTemplate.selectOne("select", id);
+	public UsersDTO select(UsersDTO usersDTO) {
+		UsersDTO dto = (UsersDTO)sqlSessionTemplate.selectOne("usersDAO.select", usersDTO.getId());
 		return dto;
 	}
 

@@ -7,10 +7,13 @@
 <title>MayEye BAEKJH Board</title>
 </head>
 <body>
+	<span>${user.name}님 환영합니다.</span>
+	<a href="<c:url value="/logout" />">로그아웃</a>
 	<table border="1">
 		<tr>
 			<th>번호</th>
 			<th>제목</th>
+			<th>작성자</th>
 			<th>작성일</th>
 			<th>조회수</th>
 		</tr>
@@ -18,6 +21,7 @@
 		<tr>
 			<td>${board.num}</td>
 			<td><a href="<c:url value="/boardRead/${board.num}" />"> ${board.title}</a></td>
+			<td>${board.name}</td>
 			<td>${board.date}</td>
 			<td>${board.count}</td>
 		</tr>

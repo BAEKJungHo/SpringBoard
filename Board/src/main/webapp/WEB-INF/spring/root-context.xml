@@ -32,7 +32,7 @@
         <property name="configLocation" value="classpath:mapper/config/mybatis-config.xml" />
         <property name="mapperLocations">
         	<list>
-        		<value>classpath:mapper/boardMapper.xml</value>
+        		<value>classpath:mapper/*.xml</value>
         	</list>
         </property>
     </bean>

@@ -1,5 +1,6 @@
 package com.mayeye.board.controller;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +18,11 @@ import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.service.BoardService;
 
 @Controller
-@SessionAttributes({"boardDTO", "usersDTO"})
+@SessionAttributes("boardDTO")
 public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
-	
-	@RequestMapping(value="/login")
-	public String login(Model model) {
-		return null;
-	}
 	
 	@RequestMapping(value="/boardList")
 	public String boardList(Model model) {
@@ -78,10 +74,12 @@ public class BoardController {
 	
 	// Hibernate-validator까지 처리한 코드
 	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
-	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult) {
+	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session, Model model) {
 		if(bindingResult.hasErrors()) {
 			return "boardWrite"; // ViewResolver로 보냄
 		} else {
+			Object loginInfo = session.getAttribute("user");
+			if(loginInfo == null) model.addAttribute("msg", false);
 			boardService.write(boardDTO);
 			return "redirect:/boardList"; // 새글을 반영하기 위해 컨트롤러로 보냄
 		}

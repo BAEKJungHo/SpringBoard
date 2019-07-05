@@ -21,8 +21,8 @@ public class UsersServiceImpl implements UsersService{
 	}
 
 	@Override
-	public UsersDTO select(String id) {
-		return usersDAO.select(id);
+	public UsersDTO select(UsersDTO usersDTO) {
+		return usersDAO.select(usersDTO);
 	}
 
 }
