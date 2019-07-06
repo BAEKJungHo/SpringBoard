@@ -26,8 +26,7 @@ public class UsersController {
 		return "login";
 	}
 	
-	// 로그인 처리 : HttpServletRequest를 사용 
-	/*
+	/* 로그인 처리 : HttpServletRequest를 사용 
 	@RequestMapping(value="/login", method = RequestMethod.POST)
 	public String login(UsersDTO usersDTO, HttpServletRequest request) {
 		HttpSession session = request.getSession();

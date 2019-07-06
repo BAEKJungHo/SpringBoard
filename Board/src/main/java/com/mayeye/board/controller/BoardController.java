@@ -18,7 +18,7 @@ import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.service.BoardService;
 
 @Controller
-@SessionAttributes("boardDTO")
+//@SessionAttributes("boardDTO")
 public class BoardController {
 
 	@Autowired
@@ -84,7 +84,7 @@ public class BoardController {
 	// 게시글 작성
 	// Hibernate-validator까지 처리한 코드
 	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
-	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session, Model model) {
+	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session) {
 		if(bindingResult.hasErrors()) {
 			return "boardWrite"; // ViewResolver로 보냄
 		} else {
@@ -97,9 +97,8 @@ public class BoardController {
 	// 게시글 수정권한 판단
 	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.GET)
 	public String boardEdit(@PathVariable int num, Model model, HttpSession session, RedirectAttributes rttr) {
-		BoardDTO boardDTO = boardService.read(num);
-		if(session.getAttribute("id").equals(boardDTO.getId())) {
-			model.addAttribute("boardDTO", boardDTO);
+		if(session.getAttribute("id").equals(boardService.read(num).getId())) {
+			 model.addAttribute("boardDTO", boardService.read(num));
 			return "boardEdit";	
 		} else {
 			rttr.addFlashAttribute("msg", "수정 권한이 없습니다");
@@ -107,9 +106,9 @@ public class BoardController {
 		}
 	}
 	
-	// 수정 검증
+	// 수정 검증 : BindingResut + Validator
 	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)
-	public String boardEdit(@Valid @ModelAttribute BoardDTO boardDTO, BindingResult bindingResult) {
+	public String boardEdit(@Valid BoardDTO boardDTO, BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) return "boardEdit";
 		else {
 			boardService.edit(boardDTO);
@@ -117,24 +116,15 @@ public class BoardController {
 		}
 	}
 	
-	// 게시글 삭제 판단
+	// 게시글 삭제
 	@RequestMapping(value="/boardDelete/{num}", method=RequestMethod.GET)
 	public String boardDelete(@PathVariable int num, Model model, HttpSession session, RedirectAttributes rttr) {
-		BoardDTO boardDTO = boardService.read(num);
-		if(session.getAttribute("id").equals(boardDTO.getId())) {
-			model.addAttribute("num", num);
-			return "boardDelete";
+		if(session.getAttribute("id").equals(boardService.read(num).getId())) {
+			boardService.delete(boardService.read(num));
+			return "redirect:/boardList";
 		} else {
 			rttr.addFlashAttribute("msg", "삭제 권한이 없습니다.");
 			return "redirect:/boardList";
 		}
-	}
-	
-	// 게시글 삭제
-	@RequestMapping(value="/boardDelete", method=RequestMethod.POST)
-	public String boardDelete(@PathVariable int num, Model model) {
-		BoardDTO boardDTO = boardService.read(num);
-		boardService.delete(boardDTO);
-		return "redirect:/boardList";
 	}
 }

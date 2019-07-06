@@ -30,8 +30,8 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public int delete(BoardDTO boardDTO) {
-		return boardDAO.delete(boardDTO);
+	public void delete(BoardDTO boardDTO) {
+		boardDAO.delete(boardDTO);
 	}
 
 	@Override

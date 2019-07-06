@@ -32,8 +32,8 @@ public class BoardDAOImpl implements BoardDAO {
 		return sqlSessionTemplate.selectList("boardDAO.list");
 	}
 	@Override
-	public int delete(BoardDTO boardDTO) {
-		return sqlSessionTemplate.delete("boardDAO.delete", boardDTO);
+	public void delete(BoardDTO boardDTO) {
+		sqlSessionTemplate.delete("boardDAO.delete", boardDTO);
 	}
 	@Override
 	public int update(BoardDTO boardDTO) {

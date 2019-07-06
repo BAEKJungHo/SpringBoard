@@ -7,7 +7,7 @@ import com.mayeye.board.dto.BoardDTO;
 public interface BoardService {
 	
 	public List<BoardDTO> list();
-	public int delete(BoardDTO boardDTO);
+	public void delete(BoardDTO boardDTO);
 	public int edit(BoardDTO boardDTO);
 	public void write(BoardDTO boardDTO);
 	public BoardDTO read(int num);
