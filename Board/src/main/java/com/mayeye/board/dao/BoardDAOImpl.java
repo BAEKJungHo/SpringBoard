@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.mayeye.board.dto.BoardDTO;
+import com.mayeye.board.dto.Criteria;
 
 @Repository
 public class BoardDAOImpl implements BoardDAO {
@@ -17,7 +18,7 @@ public class BoardDAOImpl implements BoardDAO {
 	
 	// 스프링 4.3 이상이면 
 	// 빈으로 등록되는 클래스에 생성자가 하나만있고
-	// 해당 의존성으로 받는 클래스가 빈으로 등록되있으면 생략가
+	// 해당 의존성으로 받는 클래스가 빈으로 등록되있으면 생략가능
 	/*
 	 * @Autowired public BoardDAOImpl (SqlSessionTemplate sqlSessionTemplate) {
 	 * this.sqlSessionTemplate = sqlSessionTemplate; }
@@ -51,5 +52,15 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public int updateReadCount(int num) {
 		return sqlSessionTemplate.update("boardDAO.updateCount", num);
+	}
+
+	@Override
+	public List<BoardDTO> listCriteria(Criteria cri) {
+		return sqlSessionTemplate.selectList("boardDAO.pageList")
+	}
+
+	@Override
+	public int totalPage(Criteria cri) {
+		return 0;
 	}
 }

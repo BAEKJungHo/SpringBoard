@@ -14,6 +14,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by num desc
 	</select>
 	
+	<!-- 게시물 전체 수 가져오기 -->
+	<select id="boardCount" resultType="int">
+		select count(*) from b_board;
+	</select>
+	
+	<!-- 페이지 적용 -->
+	<select id="pageList" resultType="boardDTO">
+		select b.num, b.title, u.name, b.date, b.count, b.id
+		from b_board as b
+		inner join b_users as u
+		where b.id = u.id
+		order by num desc limit #{pageNum}, #{contentNum}
+	</select>
+	
 	<!-- 해당 게시글 보기 -->
 	<select id="select" parameterType="int" resultType="boardDTO">
 		select * from b_board
@@ -44,5 +58,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		delete from b_board
 		where num = #{num}
 	</delete>
-	
 </mapper>

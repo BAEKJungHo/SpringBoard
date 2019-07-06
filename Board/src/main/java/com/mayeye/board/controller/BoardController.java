@@ -1,5 +1,6 @@
 package com.mayeye.board.controller;
 
+
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -7,23 +8,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mayeye.board.dto.BoardDTO;
+import com.mayeye.board.dto.Criteria;
+import com.mayeye.board.dto.PageMaker;
 import com.mayeye.board.service.BoardService;
 
 @Controller
-//@SessionAttributes("boardDTO")
 public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
 	
+	// 게시판 페이징
+	@RequestMapping(value="/boardPageList")
+	public ModelAndView boardPageList(Criteria cri) {
+		ModelAndView mav = new ModelAndView("/boardPageList");
+		
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(100);
+		
+		List<Map<String, Object>> list = boardService.
+	}
+
 	// 게시판 목록
 	@RequestMapping(value="/boardList")
 	public String boardList(Model model, HttpSession session) {
