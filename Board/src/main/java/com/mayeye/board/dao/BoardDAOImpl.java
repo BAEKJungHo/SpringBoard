@@ -1,5 +1,6 @@
 package com.mayeye.board.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.dto.Criteria;
+import com.mayeye.board.dto.SearchCriteria;
 
 @Repository
 public class BoardDAOImpl implements BoardDAO {
@@ -70,6 +72,31 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public int countBoardList() {
 		return sqlSessionTemplate.selectOne("boardDAO.countBoardList");
+	}
+	
+	/* 검색 원본 
+	@Override
+	public List<BoardDTO> searchList(String searchOption, String keyword) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("searchOption", searchOption);
+		map.put("keyword", keyword);
+		return sqlSessionTemplate.selectList("boardDAO.searchList", map);
+	}
+	 */
+
+	// 검색 페이지까지 적용
+	@Override
+	public List<BoardDTO> searchList(SearchCriteria cri) {
+		// 자동 형변환
+		return sqlSessionTemplate.selectList("boardDAO.searchList", cri);
+	}
+
+	@Override
+	public int countArticle(String searchOption, String keyword) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("searchOption", searchOption);
+		map.put("keyword", keyword);
+		return sqlSessionTemplate.selectOne("boardDAO.countArticle", map);
 	}
 
 }

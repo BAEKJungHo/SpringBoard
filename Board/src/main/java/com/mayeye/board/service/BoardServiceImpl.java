@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.mayeye.board.dao.BoardDAO;
 import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.dto.Criteria;
+import com.mayeye.board.dto.SearchCriteria;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -60,6 +61,23 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public int countBoardList() {
 		return boardDAO.countBoardList();
+	}
+
+	/* 검색 원본
+	@Override
+	public List<BoardDTO> searchList(String searchOption, String keyword) {
+		return boardDAO.searchList(searchOption, keyword);
+	}
+	*/
+	
+	@Override
+	public List<BoardDTO> searchList(SearchCriteria cri) {
+		return boardDAO.searchList(cri);
+	}
+	
+	@Override
+	public int countArticle(String searchOption, String keyword) {
+		return boardDAO.countArticle(searchOption, keyword);
 	}
 
 }

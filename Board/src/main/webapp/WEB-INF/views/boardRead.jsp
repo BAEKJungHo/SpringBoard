@@ -28,7 +28,7 @@
 	<div>
 		<a href="<c:url value="/boardEdit/${boardDTO.num}" />">수정</a>
 		<a href="<c:url value="/boardDelete/${boardDTO.num}" />">삭제</a>
-		<a href="<c:url value="/boardPageList" />">목록</a>
+		<a href="<c:url value="/boardSearchList" />">목록</a>
 	</div>
 </body>
 </html>

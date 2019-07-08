@@ -80,4 +80,46 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where num = #{num}
 	]]> 
 	</delete>
+	
+	<!-- 검색 대한 게시글 수 -->
+	<select id="countArticle" resultType="int">
+		select count(*) 
+		from b_board as b
+		inner join b_users as u
+		on (b.id = u.id)
+		WHERE del_chk = 'N'
+		<include refid="search" />
+	</select>
+	
+	<!-- 검색 -->
+	<select id="searchList" resultType="boardDTO">
+		select b.num, b.title, u.name, date_format(b.date, '%Y-%m-%d') as date, b.count, b.id 
+		from b_board as b
+		inner join b_users as u
+		on (b.id = u.id)
+		WHERE del_chk = 'N'
+		<include refid="search" />
+		order by num desc
+		limit #{pageStart}, #{perPageNum}
+	</select>
+	
+	<!-- include할 search -->
+	<sql id="search">
+		<choose>
+			<when test="searchType == 'all'">
+				and (u.name like CONCAT('%', #{keyword}, '%')
+				or b.contents like CONCAT('%', #{keyword}, '%')
+				or b.title like CONCAT('%', #{keyword}, '%'))
+			</when>
+			<when test="searchType == 'writer'">
+				and U.NAME like CONCAT('%', #{keyword}, '%')
+			</when>
+			<when test="searchType == 'content'">
+				AND b.contents like CONCAT('%', #{keyword}, '%')
+			</when>
+			<when test="searchType == 'title'">
+				AND b.title like CONCAT('%', #{keyword}, '%')
+			</when>
+		</choose>
+	</sql>
 </mapper>

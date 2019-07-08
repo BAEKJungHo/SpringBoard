@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.dto.Criteria;
+import com.mayeye.board.dto.SearchCriteria;
 
 public interface BoardService {
 	
@@ -15,5 +16,7 @@ public interface BoardService {
 	public BoardDTO read(int num);
 	List<Map<String, Object>> pageList(Criteria cri);
 	public int countBoardList();
-	
+	// public List<BoardDTO> searchList(String searchOption, String keyword);
+	public List<BoardDTO> searchList(SearchCriteria cri);
+	public int countArticle(String searchOption, String keyword);
 }

@@ -6,10 +6,10 @@
 	<appender name="console" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+			<param name="ConversionPattern" value="[%5p] %d{hh\:mm s} (%F\:%L) %c{1}.%M \: %m%n" />
 		</layout>
 	</appender>
-	
+
 	<!-- Application Loggers -->
 	<logger name="com.mayeye.board">
 		<level value="info" />
@@ -31,7 +31,7 @@
 	<logger name="org.springframework.web">
 		<level value="info" />
 	</logger>
-
+	
 	<!-- Root Logger -->
 	<root>
 		<priority value="warn" />

@@ -1,5 +1,10 @@
 package com.mayeye.board.dto;
 
+import java.net.URLEncoder;
+
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
 public class PageMaker {
 
 	private Criteria cri;
@@ -9,6 +14,29 @@ public class PageMaker {
 	private boolean prev;
 	private boolean next;
 	private int displayPageNum = 5;
+	
+	/* 검색 조건과 검색 키워드 처리 */
+	public String makeSearch(int page) {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance()
+			.queryParam("page", page)
+			.queryParam("pagePageNum", cri.getPerPageNum())
+			.queryParam("searchType", ((SearchCriteria)cri).getSearchType())
+			.queryParam("keyword", encoding(((SearchCriteria)cri).getKeyword()))
+			.build();
+			
+		return uriComponents.toUriString();
+	}
+	
+	/* 검색 키워드 인코딩 처리 */
+	public String encoding(String keyword) {
+		if(keyword == null || keyword.trim().length() == 0) return "";
+		
+		try {
+			return URLEncoder.encode(keyword, "UTF-8");
+		} catch(Exception e) {
+			return "";
+		}
+	}
 	
 	public Criteria getCri() {
 		return cri;
