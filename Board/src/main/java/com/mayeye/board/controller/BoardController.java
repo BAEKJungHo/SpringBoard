@@ -30,18 +30,26 @@ public class BoardController {
 	
 	// 게시판 페이징
 	@RequestMapping(value="/boardPageList")
-	public ModelAndView boardPageList(Criteria cri) {
-		ModelAndView mav = new ModelAndView("/boardPageList");
-		PageMaker pageMaker = new PageMaker();
-		pageMaker.setCri(cri);
-		pageMaker.setTotalCount(boardService.countBoardList());
+	public ModelAndView boardPageList(Criteria cri, HttpSession session) {
+		ModelAndView mav = null;
+		if(session.getAttribute("id") == null) {
+			mav = new ModelAndView("redirect");
+			mav.addObject("msg", "잘못된 접근 입니다!!");
+			mav.addObject("url", "login");
+			return mav;
+		} else {
+			mav = new ModelAndView("/boardPageList");
+			PageMaker pageMaker = new PageMaker();
+			pageMaker.setCri(cri);
+			pageMaker.setTotalCount(boardService.countBoardList());
+			
+			List<Map<String, Object>> list = boardService.pageList(cri);
 		
-		List<Map<String, Object>> list = boardService.pageList(cri);
-	
-		mav.addObject("list", list);
-		mav.addObject("pageMaker", pageMaker);
-		
-		return mav;
+			mav.addObject("list", list);
+			mav.addObject("pageMaker", pageMaker);
+			
+			return mav;
+		}
 	}
 
 	// 게시판 목록

@@ -11,7 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select b.num, b.title, u.name, b.date, b.count, b.id 
 		from b_board as b
 		inner join b_users as u
-		where b.id = u.id and del_chk <> 'Y'
+		where b.id = u.id and del_chk = 'N'
 		order by num desc
 	]]>
 	</select>
@@ -24,10 +24,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 페이지 적용 -->
 	<select id="pageList" resultType="hashmap" parameterType="hashmap">
 	<![CDATA[
-        select b.num, b.title, u.name, date_format(b.date, '%Y-%m-%d'), b.count, b.id 
+        select b.num, b.title, u.name, date_format(b.date, '%Y-%m-%d') as date, b.count, b.id 
         from b_board as b
         inner join b_users as u
-        where b.id = u.id and del_chk <> 'Y'
+        where b.id = u.id and del_chk = 'N'
         order by num desc
         limit #{pageStart}, #{perPageNum}
     ]]>
@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <![CDATA[
         select count(*)
         from b_board
-        where del_chk <> 'Y'
+        where del_chk = 'N'
     ]]>
 	</select>
 
@@ -67,9 +67,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where num = #{num}
 	</update>
 	
-	<!-- 삭제 -->
+	<!-- 삭제 
 	<delete id="delete" parameterType="boardDTO">
 		delete from b_board
 		where num = #{num}
+	</delete> -->
+	
+	<!-- 삭제 : 상태값 -->
+	<delete id="delete" parameterType="boardDTO">
+	<![CDATA[
+		update b_board set del_chk = 'Y'
+		where num = #{num}
+	]]> 
 	</delete>
 </mapper>

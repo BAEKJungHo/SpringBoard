@@ -31,7 +31,7 @@
 		</table>
 		<div>
 			<input type="submit" value="등록">
-			<a href="<c:url value="/boardList" />"> 목록</a>
+			<a href="<c:url value="/boardPageList" />"> 목록</a>
 		</div>
 	</form:form>
 </body>

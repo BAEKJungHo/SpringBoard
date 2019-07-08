@@ -31,17 +31,17 @@
 		<tr>
 		    <c:if test="${pageMaker.prev}">
 		    <td>
-		        <a href='<c:url value="/boardPageList?page=${pageMaker.startPage-1}"/>'>&laquo;</i></a>
+		        <a href='<c:url value="/boardPageList?page=${pageMaker.startPage-1}"/>'>&laquo;</a>
 		    </td>
 		    </c:if>
 		    <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="idx">
 		    <td>
-		        <a href='<c:url value="/boardPageList?page=${idx}"/>'><i class="fa">${idx}</i></a>
+		        <a href='<c:url value="/boardPageList?page=${idx}"/>'>${idx}</a>
 		    </td>
 		    </c:forEach>
 		    <c:if test="${pageMaker.next && pageMaker.endPage >0}">
 		    <td>
-		        <a href='<c:url value="/boardPageList?page=${pageMaker.endPage+1}"/>'>&raquo;</i></a>
+		        <a href='<c:url value="/boardPageList?page=${pageMaker.endPage+1}"/>'>&raquo;</a>
 		    </td>
 		    </c:if>
 		</tr>

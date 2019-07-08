@@ -33,23 +33,28 @@ public class BoardDAOImpl implements BoardDAO {
 	public List<BoardDTO> list() {
 		return sqlSessionTemplate.selectList("boardDAO.list");
 	}
+	
 	@Override
 	public void delete(BoardDTO boardDTO) {
 		sqlSessionTemplate.delete("boardDAO.delete", boardDTO);
 	}
+	
 	@Override
 	public int update(BoardDTO boardDTO) {
 		return sqlSessionTemplate.update("boardDAO.update", boardDTO);
 	}
+	
 	@Override
 	public void insert(BoardDTO boardDTO) {
 		sqlSessionTemplate.insert("boardDAO.insert", boardDTO);
 	}
+	
 	@Override
 	public BoardDTO select(int num) {
 		BoardDTO dto = (BoardDTO)sqlSessionTemplate.selectOne("boardDAO.select", num);
 		return dto;
 	}
+	
 	@Override
 	public int updateReadCount(int num) {
 		return sqlSessionTemplate.update("boardDAO.updateCount", num);
