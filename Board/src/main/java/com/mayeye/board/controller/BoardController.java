@@ -17,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -48,7 +47,9 @@ public class BoardController {
 		
 		List<BoardDTO> searchList = boardService.searchList(cri);
 		int count = boardService.countArticle(cri.getSearchType(), cri.getKeyword());
-		
+		Logger.info("searchType     " + cri.getSearchType());
+		Logger.info("keyword     " + cri.getKeyword());
+		Logger.info("svf     " + String.valueOf(count));
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("searchList", searchList);
 		map.put("count", count);
