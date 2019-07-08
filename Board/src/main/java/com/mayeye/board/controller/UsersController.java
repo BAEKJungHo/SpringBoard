@@ -45,7 +45,7 @@ public class UsersController {
 			UsersDTO user = usersService.select(usersDTO);
 			session.setAttribute("user", user);
 			session.setAttribute("id", user.getId());
-			return "redirect:/boardList";
+			return "redirect:/boardPageList";
 		} else {
 			rttr.addFlashAttribute("msg", "아이디 또는 비밀번호가 틀렸습니다");
 			return "redirect:/login";

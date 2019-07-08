@@ -1,6 +1,9 @@
 package com.mayeye.board.controller;
 
 
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -29,12 +32,16 @@ public class BoardController {
 	@RequestMapping(value="/boardPageList")
 	public ModelAndView boardPageList(Criteria cri) {
 		ModelAndView mav = new ModelAndView("/boardPageList");
-		
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
-		pageMaker.setTotalCount(100);
+		pageMaker.setTotalCount(boardService.countBoardList());
 		
-		List<Map<String, Object>> list = boardService.
+		List<Map<String, Object>> list = boardService.pageList(cri);
+	
+		mav.addObject("list", list);
+		mav.addObject("pageMaker", pageMaker);
+		
+		return mav;
 	}
 
 	// 게시판 목록
@@ -66,34 +73,6 @@ public class BoardController {
 		return "boardWrite";
 	}
 	
-	// form 태그로 POST 방식으로 지정
-	
-	/*
-	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
-	public String boardWrite(BoardDTO boardDTO) {
-		boardService.write(boardDTO);
-		return "redirect:/boardList";
-	}
-	* 이 방식은 너무 낙관적, 사용자가 제목, 내용등을 작성하지 않았거나, 
-	* 숫자를 입력해야 하는 곳에 숫자로 변환 불가능한 값을 입력하면 바인딩 에러 처리를 위한 코드가 없음
-	* 스프링 MVC는 이런 작업도 적은 코드로 작성할 수 있게 지원
-	*/
-	
-	/* 바인딩 에러 처리한 코드
-	* BindingResult객체의 hasErrors() 메서드 호출하면 바인딩할 때 오류가 있는 경우 true 반환
-	*/ 
-	/*
-	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
-	public String boardWrite(BoardDTO boardDTO, BindingResult bindingResult) {
-		if(bindingResult.hasErrors()) {
-			return "boardWrite"; // ViewResolver로 보냄
-		} else {
-			boardService.write(boardDTO);
-			return "redirect:/boardList"; // 새글을 반영하기 위해 컨트롤러로 보냄
-		}
-	}
-	*/
-	
 	// 게시글 작성
 	// Hibernate-validator까지 처리한 코드
 	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
@@ -103,7 +82,7 @@ public class BoardController {
 		} else {
 			boardDTO.setId((String)session.getAttribute("id"));
 			boardService.write(boardDTO);
-			return "redirect:/boardList"; // 새글을 반영하기 위해 컨트롤러로 보냄
+			return "redirect:/boardPageList"; // 새글을 반영하기 위해 컨트롤러로 보냄
 		}
 	}
 	
@@ -115,7 +94,7 @@ public class BoardController {
 			return "boardEdit";	
 		} else {
 			rttr.addFlashAttribute("msg", "수정 권한이 없습니다");
-			return "redirect:/boardList";
+			return "redirect:/boardPageList";
 		}
 	}
 	
@@ -125,7 +104,7 @@ public class BoardController {
 		if(bindingResult.hasErrors()) return "boardEdit";
 		else {
 			boardService.edit(boardDTO);
-			return "redirect:/boardList";
+			return "redirect:/boardPageList";
 		}
 	}
 	
@@ -134,10 +113,10 @@ public class BoardController {
 	public String boardDelete(@PathVariable int num, Model model, HttpSession session, RedirectAttributes rttr) {
 		if(session.getAttribute("id").equals(boardService.read(num).getId())) {
 			boardService.delete(boardService.read(num));
-			return "redirect:/boardList";
+			return "redirect:/boardPageList";
 		} else {
 			rttr.addFlashAttribute("msg", "삭제 권한이 없습니다.");
-			return "redirect:/boardList";
+			return "redirect:/boardPageList";
 		}
 	}
 }

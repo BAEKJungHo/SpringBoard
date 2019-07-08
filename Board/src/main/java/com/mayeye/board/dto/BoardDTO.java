@@ -14,6 +14,7 @@ public class BoardDTO {
 	@NotEmpty(message="내용을 입력하세요.")
 	private String contents; // 내용
 	private String id;
+	private String del_chk; // 삭제 여부
 	
 	public int getNum() {
 		return num;
@@ -52,16 +53,21 @@ public class BoardDTO {
 	public void setContents(String contents) {
 		this.contents = contents;
 	}
-	
 	public String getId() {
 		return id;
 	}
 	public void setId(String id) {
 		this.id = id;
 	}
+	public String getDel_chk() {
+		return del_chk;
+	}
+	public void setDel_chk(String del_chk) {
+		this.del_chk = del_chk;
+	}
 	@Override
 	public String toString() {
 		return "BoardDTO [num=" + num + ", title=" + title + ", count=" + count + ", name=" + name + ", date=" + date
-				+ ", contents=" + contents + ", id=" + id + "]";
+				+ ", contents=" + contents + ", id=" + id + ", del_chk=" + del_chk + "]";
 	}
 }

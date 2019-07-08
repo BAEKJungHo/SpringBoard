@@ -1,6 +1,7 @@
 package com.mayeye.board.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +55,16 @@ public class BoardDAOImpl implements BoardDAO {
 		return sqlSessionTemplate.update("boardDAO.updateCount", num);
 	}
 
+	// Criteria 객체에 담아서 SQL 매핑에 보낼 파라미터
+	// 특정 페이지 게시글의 행(pageStart)과 페이지당 보여줄 게시글의 갯수(perPageNum)
 	@Override
-	public List<BoardDTO> listCriteria(Criteria cri) {
-		return sqlSessionTemplate.selectList("boardDAO.pageList")
+	public List<Map<String, Object>> pageList(Criteria cri) {
+		return sqlSessionTemplate.selectList("boardDAO.pageList", cri);
 	}
 
 	@Override
-	public int totalPage(Criteria cri) {
-		return 0;
+	public int countBoardList() {
+		return sqlSessionTemplate.selectOne("boardDAO.countBoardList");
 	}
+
 }

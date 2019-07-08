@@ -7,11 +7,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="boardDAO">
 	<!-- 게시판 목록 -->
 	<select id="list" resultType="boardDTO">
+	<![CDATA[
 		select b.num, b.title, u.name, b.date, b.count, b.id 
 		from b_board as b
 		inner join b_users as u
-		where b.id = u.id
+		where b.id = u.id and del_chk <> 'Y'
 		order by num desc
+	]]>
 	</select>
 	
 	<!-- 게시물 전체 수 가져오기 -->
@@ -20,14 +22,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 페이지 적용 -->
-	<select id="pageList" resultType="boardDTO">
-		select b.num, b.title, u.name, b.date, b.count, b.id
-		from b_board as b
-		inner join b_users as u
-		where b.id = u.id
-		order by num desc limit #{pageNum}, #{contentNum}
+	<select id="pageList" resultType="hashmap" parameterType="hashmap">
+	<![CDATA[
+        select b.num, b.title, u.name, date_format(b.date, '%Y-%m-%d'), b.count, b.id 
+        from b_board as b
+        inner join b_users as u
+        where b.id = u.id and del_chk <> 'Y'
+        order by num desc
+        limit #{pageStart}, #{perPageNum}
+    ]]>
 	</select>
 	
+	<!-- 총 게시글 수 -->
+	<select id="countBoardList" resultType="Integer">
+    <![CDATA[
+        select count(*)
+        from b_board
+        where del_chk <> 'Y'
+    ]]>
+	</select>
+
 	<!-- 해당 게시글 보기 -->
 	<select id="select" parameterType="int" resultType="boardDTO">
 		select * from b_board
@@ -49,7 +63,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 조회수 증가 -->
 	<update id="updateCount" parameterType="int">
 		update b_board set
-		count=count+1
+		count = count+1
 		where num = #{num}
 	</update>
 	

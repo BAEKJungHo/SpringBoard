@@ -1,12 +1,14 @@
 package com.mayeye.board.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mayeye.board.dao.BoardDAO;
 import com.mayeye.board.dto.BoardDTO;
+import com.mayeye.board.dto.Criteria;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -48,6 +50,16 @@ public class BoardServiceImpl implements BoardService {
 	public BoardDTO read(int num) {
 		boardDAO.updateReadCount(num);
 		return boardDAO.select(num);
+	}
+
+	@Override
+	public List<Map<String, Object>> pageList(Criteria cri) {
+		return boardDAO.pageList(cri);
+	}
+
+	@Override
+	public int countBoardList() {
+		return boardDAO.countBoardList();
 	}
 
 }
