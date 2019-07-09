@@ -26,3 +26,15 @@
     	PRIMARY KEY (id)
   	) DEFAULT CHARSET=utf8;
 	```
+
+### Files 
+
+	```sql 
+	create table files (
+	fullname varchar(150) not null, 
+	bno int(6) unsigned not null, 
+	date datetime not null default current_timestamp,
+	primary key (fullname),
+	foreign key (bno) references b_board(num)
+	) DEFAULT CHARSET=utf8;
+	```

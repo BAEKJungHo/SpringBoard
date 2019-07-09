@@ -11,7 +11,13 @@
 <title>MayEye BAEKJH Board</title>
 </head>
 <body>
-<!-- 변경 코드 -->
+	<!-- ajax 방식 -->
+	<form name="uploadForm" id="ajaxForm" action="<c:url value="/uploadForm" />" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="type" value="ajax" />
+		 <label for="file">파일 </label> <input multiple="multiple" name="files[]" id="files" type="file" style="width:500px"/>
+		<input type="submit" value="ajax로 제출"/>
+	</form>
+
 	<c:if test="${msg eq null}" >
 	<form:form commandName="boardDTO" mehtod="post">
 		<table border="1">
@@ -36,22 +42,5 @@
 		</div>
 	</form:form>
 	</c:if>
-<!-- 기존 코드 -->
-<%-- 	<form action="<c:url value="/board/write" />" method="POST">
-		<table border="1">
-			<tr>
-				<th>제목</th>
-				<td><input type="text" name="title"></td>
-			</tr>
-			<tr>
-				<th>내용</th>
-				<td><input type="text" name="contents"></td>
-			</tr>
-		</table>
-		<div>
-			<input type="submit" value="등록">
-			<a href="<c:url value="/boardList" />"> 목록</a>
-		</div>
-	</form> --%>
 </body>
 </html>

@@ -35,7 +35,7 @@
 		</tr>
 		<c:forEach var="board" items="${map.searchList}" varStatus="loop">
 		<tr>
-			<td>${board.num}</td>
+			<td>${loop.count}</td>
 			<td><a href="<c:url value="/boardRead/${board.num}" />"> ${board.title}</a></td>
 			<td>${board.name}</td>
 			<td>${board.date}</td>
