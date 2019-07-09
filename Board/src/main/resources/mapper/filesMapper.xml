@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="filesDAO">
+	<!-- 파일 Insert -->
+	<insert id="insert" parameterType="filesDTO">
+		INSERET INTO b_files (file_key, ori_name, save_name, save_path)
+		VALUES(#{file_key},#{ori_name},#{save_name},#{save_path}) 
+	</insert>
+	
+	<!-- 게시글 번호에 해당하는 첨부파일의 목록을 조회하는 쿼리 -->
+	<!-- 첨부파일의 크기를 Kb 단위로 보여주기 위해서 ROUND 함수 사용 -->
+	<select id="selectFileList" parameterType="hashmap" resultType="hashmap">
+	<![CDATA[
+		SELECT b.num, f.file_key f.ori_name, f.save_name, f.save_path, ROUND(file_size/1024,1) AS file_size
+		FROM b_files as f
+		INNER JOIN b_board as b
+		ON (f.file_key = b.file_key)
+		WHERE b.num = #{num} AND del_chk = 'N'
+	]]>
+	</select>
+</mapper>

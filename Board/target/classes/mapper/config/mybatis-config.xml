@@ -11,6 +11,7 @@
 	<typeAliases>
 		<typeAlias alias="boardDto" type="com.mayeye.board.dto.BoardDTO"/>
 		<typeAlias alias="usersDto" type="com.mayeye.board.dto.UsersDTO"/>
+		<typeAlias alias="filesDto" type="com.mayeye.board.dto.FilesDTO"/>
 	</typeAliases>
 
 </configuration>

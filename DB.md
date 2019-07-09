@@ -10,9 +10,11 @@
    	date datetime NOT NULL DEFAULT current_timestamp,
    	contents varchar(250),
    	id varchar(20) not null default '',
+	file_key varchar(150) not null,
    	del_chk varchar(1) not null default 'N',
    	PRIMARY KEY (num),
-   	foreign key (id) references b_users(id)
+   	foreign key (id) references b_users(id),
+	foreign key (file_key) references b_files(file_key)
    	) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 	```
 
@@ -30,11 +32,13 @@
 ### Files 
 
 	```sql 
-	create table files (
-	fullname varchar(150) not null, 
-	bno int(6) unsigned not null, 
-	date datetime not null default current_timestamp,
-	primary key (fullname),
-	foreign key (bno) references b_board(num)
-	) DEFAULT CHARSET=utf8;
+    	create table b_files (
+   	file_key varchar(150) not null default '0', 
+   	ori_name varchar(150) not null, 
+   	save_name varchar(150) not null, 
+   	save_path varchar(150) not null, 
+   	file_size varchar(20) not null,
+   	date datetime not null default current_timestamp,
+   	primary key (file_key)
+    	) DEFAULT CHARSET=utf8;
 	```

@@ -11,15 +11,8 @@
 <title>MayEye BAEKJH Board</title>
 </head>
 <body>
-	<!-- ajax 방식 -->
-	<form name="uploadForm" id="ajaxForm" action="<c:url value="/uploadForm" />" method="post" enctype="multipart/form-data">
-		<input type="hidden" name="type" value="ajax" />
-		 <label for="file">파일 </label> <input multiple="multiple" name="files[]" id="files" type="file" style="width:500px"/>
-		<input type="submit" value="ajax로 제출"/>
-	</form>
-
 	<c:if test="${msg eq null}" >
-	<form:form commandName="boardDTO" mehtod="post">
+	<form:form commandName="boardDTO" mehtod="post" enctype="multipart/form-data">
 		<table border="1">
 			<tr>
 				<th><form:label path="title">제목</form:label></th>
@@ -34,6 +27,9 @@
 					<form:input path="contents" />
 					<form:errors path="contents" />
 				</td>
+			</tr>
+			<tr><!--  <form:hidden path="file_key" /> -->
+				<td><input type="file" name="file" /></td>
 			</tr>
 		</table>
 		<div>

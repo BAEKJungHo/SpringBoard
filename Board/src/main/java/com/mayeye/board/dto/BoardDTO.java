@@ -15,6 +15,7 @@ public class BoardDTO {
 	private String contents; // 내용
 	private String id;
 	private String del_chk; // 삭제 여부
+	private String file_key;
 	
 	public int getNum() {
 		return num;
@@ -65,9 +66,15 @@ public class BoardDTO {
 	public void setDel_chk(String del_chk) {
 		this.del_chk = del_chk;
 	}
+	public String getFile_key() {
+		return file_key;
+	}
+	public void setFile_key(String file_key) {
+		this.file_key = file_key;
+	}
 	@Override
 	public String toString() {
 		return "BoardDTO [num=" + num + ", title=" + title + ", count=" + count + ", name=" + name + ", date=" + date
-				+ ", contents=" + contents + ", id=" + id + ", del_chk=" + del_chk + "]";
+				+ ", contents=" + contents + ", id=" + id + ", del_chk=" + del_chk + ", file_key=" + file_key + "]";
 	}
 }

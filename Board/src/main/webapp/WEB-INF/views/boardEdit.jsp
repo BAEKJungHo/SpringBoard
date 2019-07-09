@@ -28,6 +28,10 @@
 					<form:errors path="contents" />
 				</td>
 			</tr>
+			<tr>
+				<th><form:hidden path="file_key" /></th>
+				<td><input type="file" name="file" /></td>
+			</tr>
 		</table>
 		<div>
 			<input type="submit" value="등록">

@@ -1,9 +1,11 @@
 package com.mayeye.board.controller;
 
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -13,10 +15,12 @@ import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -25,6 +29,7 @@ import com.mayeye.board.dto.Criteria;
 import com.mayeye.board.dto.PageMaker;
 import com.mayeye.board.dto.SearchCriteria;
 import com.mayeye.board.service.BoardService;
+import com.mayeye.board.service.FilesService;
 
 @Controller
 public class BoardController {
@@ -33,6 +38,9 @@ public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
+	
+	@Autowired
+	private FilesService filesService;
 	
 	// 게시판 페이징 + 검색
 	@RequestMapping(value="/boardSearchList")
@@ -116,14 +124,34 @@ public class BoardController {
 	// 게시글 작성
 	// Hibernate-validator까지 처리한 코드
 	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
-	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session) {
+	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session, MultipartFile file, Model model) throws Exception {
+		Logger.info("upload POST .....OriginalName={}, size={}", file.getOriginalFilename(), file.getSize());
 		if(bindingResult.hasErrors()) {
 			return "boardWrite"; // ViewResolver로 보냄
 		} else {
+			/* uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 */  
+			String savedFileName = uploadFile(file); 
+			model.addAttribute("savedFileName", savedFileName);
+			
+			boardDTO.setFile_key(savedFileName);
 			boardDTO.setId((String)session.getAttribute("id"));
+			
 			boardService.write(boardDTO);
 			return "redirect:/boardSearchList"; // 새글을 반영하기 위해 컨트롤러로 보냄
 		}
+	}
+	
+	// 업로드에 관한 파일 로직
+	private String uploadFile(MultipartFile file) throws Exception {
+		/* UUID는 유니크한 ID값을 random으로 toString()화 하고 뒤에 오리지널 파일 명과 합침
+		* 장점 : 성능도 괜찮고, 유니크한 ID값을 가질 수있다. 
+		* 단점 : 파일 명이 길어진다.
+		* 서버에 저장된 파일명을 가져와서 uploadPath 경로에 만들고 FileCopyUtils.copy()를 이용해서 쓴다.
+		*/
+		String savedFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+		File target = new File(uploadPath, savedFileName);
+		FileCopyUtils.copy(file.getBytes(), target);
+		return savedFileName;
 	}
 	
 	// 게시글 수정권한 판단
