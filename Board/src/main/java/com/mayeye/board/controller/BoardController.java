@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -41,6 +42,14 @@ public class BoardController {
 	
 	@Autowired
 	private FilesService filesService;
+	
+	/* 객체의 이름이 일치하는 객체 자동주입 
+	* name 속성명에는 IOC 컨테이너에서 설정한 id 명으로 입력 
+	* 스프링 설정 파일을 불러올 때 유용하게 쓰임
+	* name 속성으로 지정한 uploadPath를 사용 할 수 있음
+	*/
+	@Resource(name="uploadPath")
+	private String uploadPath;
 	
 	// 게시판 페이징 + 검색
 	@RequestMapping(value="/boardSearchList")
