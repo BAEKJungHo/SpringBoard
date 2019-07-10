@@ -5,10 +5,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 <!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
 <mapper namespace="filesDAO">
-	<!-- 파일 Insert -->
-	<insert id="insert" parameterType="filesDTO">
-		INSERET INTO b_files (file_key, ori_name, save_name, save_path)
-		VALUES(#{file_key},#{ori_name},#{save_name},#{save_path}) 
+	<!-- FileDetail Insert -->
+	<insert id="insertFileDetail" parameterType="fileDetail">
+		INSERT INTO b_filedetail (atch_file_id, ori_name, save_name, save_path, file_size)
+		VALUES (#{atch_file_id},#{ori_name},#{save_name},#{save_path},#{file_size}) 
+	</insert>
+	
+	<!-- FileMaster Insert -->
+	<insert id="insertFileMaster" parameterType="fileMaster">
+		INSERT INTO b_filemaster (atch_file_id)
+		VALUES (#{atch_file_id}) 
 	</insert>
 	
 	<!-- 게시글 번호에 해당하는 첨부파일의 목록을 조회하는 쿼리 -->
@@ -21,5 +27,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ON (f.file_key = b.file_key)
 		WHERE b.num = #{num} AND del_chk = 'N'
 	]]>
+	</select>
+	
+	<select id="findFileDetail" parameterType="fileDetail" resultType="fileDetail">
+		<![CDATA[
+			SELECT
+				*
+			FROM B_FILEDETAIL
+			WHERE ATCH_FILE_ID = #{atch_file_id}
+		]]>
 	</select>
 </mapper>

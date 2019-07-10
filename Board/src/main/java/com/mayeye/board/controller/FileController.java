@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-public class UploadController {
+public class FileController {
 	
-	private static final Logger Logger = LoggerFactory.getLogger(BoardController.class);
+	private static final Logger Logger = LoggerFactory.getLogger(FileController.class);
 	
 	/* 객체의 이름이 일치하는 객체 자동주입 
 	* name 속성명에는 IOC 컨테이너에서 설정한 id 명으로 입력 

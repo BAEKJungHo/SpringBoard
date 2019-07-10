@@ -28,7 +28,7 @@
 					<form:errors path="contents" />
 				</td>
 			</tr>
-			<tr><!--  <form:hidden path="file_key" /> -->
+			<tr>
 				<td><input type="file" name="file" /></td>
 			</tr>
 		</table>

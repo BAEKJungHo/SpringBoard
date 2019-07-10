@@ -24,6 +24,10 @@
 			<th>조회수</th>
 			<td>${boardDTO.count}</td>
 		</tr>	
+		<tr>
+			<th>첨부파일</th>
+			<td><a href="<c:url value="/fileDownload/${boardDTO.num}" />">${boardDTO.ori_name}</a></td>
+		</tr>
 	</table>
 	<div>
 		<a href="<c:url value="/boardEdit/${boardDTO.num}" />">수정</a>

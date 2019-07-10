@@ -5,15 +5,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.mayeye.board.controller.BoardController;
 import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.dto.Criteria;
 import com.mayeye.board.dto.SearchCriteria;
 
 @Repository
 public class BoardDAOImpl implements BoardDAO {
+	
+	private static final Logger Logger = LoggerFactory.getLogger(BoardController.class);
 	
 	@Autowired
 	private SqlSessionTemplate sqlSessionTemplate;
@@ -54,6 +59,8 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public BoardDTO select(int num) {
 		BoardDTO dto = (BoardDTO)sqlSessionTemplate.selectOne("boardDAO.select", num);
+		Logger.info("DAOImpl.....  ORI_NAME ....." + dto.getOri_name());
+		Logger.info("DAOImpl.....  name ....." + dto.getName());
 		return dto;
 	}
 	

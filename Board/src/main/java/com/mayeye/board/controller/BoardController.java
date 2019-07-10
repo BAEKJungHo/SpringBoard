@@ -2,9 +2,11 @@ package com.mayeye.board.controller;
 
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -27,6 +29,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.dto.Criteria;
+import com.mayeye.board.dto.FileDetail;
+import com.mayeye.board.dto.FileMaster;
 import com.mayeye.board.dto.PageMaker;
 import com.mayeye.board.dto.SearchCriteria;
 import com.mayeye.board.service.BoardService;
@@ -118,7 +122,16 @@ public class BoardController {
 	// 게시글 상세 내역
 	@RequestMapping(value="/boardRead/{num}")
 	public String boardRead(Model model, @PathVariable int num) {
-		model.addAttribute("boardDTO", boardService.read(num));
+		BoardDTO boardDTO = boardService.read(num);
+		Logger.info("READ !! ORI FILE NAME ....." + boardDTO.getOri_name());
+		Logger.info("READ !! NAME ....." + boardDTO.getName());
+		Logger.info("READ !! TITLE ....." + boardDTO.getTitle());
+		
+//		FileDetail file = new FileDetail();
+//		file.setAtch_file_id(boardDTO.getAtch_file_id());
+//		file = filesService.findFileDetail(file);
+		
+		model.addAttribute("boardDTO", boardDTO);
 		return "boardRead";
 	}
 	
@@ -132,35 +145,102 @@ public class BoardController {
 	
 	// 게시글 작성
 	// Hibernate-validator까지 처리한 코드
+	// MultipartFile을 이용하면 View에서 enctype="multipart/form-data" 처리한 폼의 파일 정보를 받을 수 있다.
+	// MultipartFile의 각종 메서드 사용
 	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
 	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session, MultipartFile file, Model model) throws Exception {
-		Logger.info("upload POST .....OriginalName={}, size={}", file.getOriginalFilename(), file.getSize());
+		Logger.info("upload POST ..... OriginalName={}, size={}", file.getOriginalFilename(), file.getSize());
 		if(bindingResult.hasErrors()) {
 			return "boardWrite"; // ViewResolver로 보냄
 		} else {
 			/* uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 */  
-			String savedFileName = uploadFile(file); 
-			model.addAttribute("savedFileName", savedFileName);
+			FileMaster fileMaster = new FileMaster();
+			FileDetail fileDetail = new FileDetail();
 			
-			boardDTO.setFile_key(savedFileName);
+			String atch_file_id = checkAtchFileId();
+
+			String save_name = uploadFile(file); 
+			model.addAttribute("save_name", save_name);
+			
+			Logger.info("SAVED FILENAME ....." + save_name);
+			Logger.info("atch_file_id ....." + atch_file_id + " atch length ....." + atch_file_id.length());
+			Logger.info("SAVED PATH ....." + uploadPath);
+			
+			// 파일 마스터 
+			fileMaster.setAtch_file_id(atch_file_id);
+			
+			// 파일 세부 사항
+			fileDetail.setAtch_file_id(atch_file_id);
+			fileDetail.setOri_name(file.getOriginalFilename());
+			fileDetail.setSave_name(save_name);
+			fileDetail.setSave_path(uploadPath);
+			fileDetail.setFile_size((int)file.getSize());
+			
+			// 게시판
+			boardDTO.setAtch_file_id(atch_file_id);
 			boardDTO.setId((String)session.getAttribute("id"));
 			
+			filesService.insertFileMaster(fileMaster);
+			filesService.insertFileDetail(fileDetail);
 			boardService.write(boardDTO);
 			return "redirect:/boardSearchList"; // 새글을 반영하기 위해 컨트롤러로 보냄
 		}
 	}
 	
-	// 업로드에 관한 파일 로직
+	// 저장 파일명 생성
 	private String uploadFile(MultipartFile file) throws Exception {
 		/* UUID는 유니크한 ID값을 random으로 toString()화 하고 뒤에 오리지널 파일 명과 합침
 		* 장점 : 성능도 괜찮고, 유니크한 ID값을 가질 수있다. 
 		* 단점 : 파일 명이 길어진다.
 		* 서버에 저장된 파일명을 가져와서 uploadPath 경로에 만들고 FileCopyUtils.copy()를 이용해서 쓴다.
+		* MultipartFile의 getBytes() 메서드를 이용하여 target에 데이터를 쓴다.
 		*/
-		String savedFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-		File target = new File(uploadPath, savedFileName);
+		String save_name = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+		File target = new File(uploadPath, save_name);
 		FileCopyUtils.copy(file.getBytes(), target);
-		return savedFileName;
+		return save_name;
+	}
+	
+	// atch_file_id 생성 : char(25)
+	private String makeAtchFileId() {
+		Random random = new Random();
+		StringBuilder temp = new StringBuilder();
+		for (int i=0; i<8; i++) {
+		    int rIndex = random.nextInt(3);
+		    switch (rIndex) {
+		    case 0:
+		        // a-z
+		        temp.append((char) ((int) (random.nextInt(26)) + 97));
+		        break;
+		    case 1:
+		        // A-Z
+		        temp.append((char) ((int) (random.nextInt(26)) + 65));
+		        break;
+		    case 2:
+		        // 0-9
+		        temp.append((random.nextInt(10)));
+		        break;
+		    }
+		}
+		String atch_file_id = "FILE_" + "000000000000" + temp;
+		return atch_file_id;
+	}
+	
+	// atch_file_id 생성 검증(중복 제거)
+	private String checkAtchFileId() {
+		List<BoardDTO> list = new ArrayList<>();
+		list = boardService.list();
+		boolean flag = true;
+		String atch_file_id = null;
+		while(flag) {
+			atch_file_id = makeAtchFileId();
+			for(BoardDTO board : list) {
+				if(!atch_file_id.equals(board.getAtch_file_id())) {
+					flag = false;
+				} else flag = true;
+			}
+		}
+		return atch_file_id;
 	}
 	
 	// 게시글 수정권한 판단

@@ -8,14 +8,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 게시판 목록 -->
 	<select id="list" resultType="boardDTO">
 	<![CDATA[
-		SELECT b.num, b.title, u.name, b.date, b.count, b.id 
+		SELECT b.num, b.title, u.name, b.date, b.count, b.contents, b.id, b.atch_file_id, f.ori_name
 		FROM b_board as b
 		INNER join b_users as u
 		ON (b.id = u.id)
+		inner join b_filedetail as f 
+		on (b.atch_file_id = f.atch_file_id)
 		WHERE del_chk = 'N'
 		ORDER BY num DESC
 	]]>
 	</select>
+	
 	
 	<!-- 게시물 전체 수 가져오기 -->
 	<select id="boardCount" resultType="int">
@@ -47,14 +50,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 해당 게시글 보기 -->
 	<select id="select" parameterType="int" resultType="boardDTO">
-		SELECT * 
-		FROM b_board
-		WHERE num = #{num}
+	<![CDATA[
+		SELECT b.num, b.title, u.name, b.date, b.count, b.contents, b.id, b.atch_file_id, f.ori_name
+		FROM b_board as b
+		INNER join b_users as u
+		ON (b.id = u.id)
+		inner join b_filemaster as m
+		on (b.atch_file_id = m.atch_file_id)
+		inner join b_filedetail as f 
+		on (m.atch_file_id = f.atch_file_id)
+		WHERE del_chk = 'N' AND num = #{num}
+		ORDER BY num DESC
+	]]>
 	</select>
 	
-	<!-- 삽입 -->
+	<!-- 삽입(첨부파일 추가)-->
 	<insert id="insert" parameterType="boardDTO">
-		INSERET INTO b_board (title, contents, id) VALUES(#{title},#{contents},#{id}) 
+		INSERT INTO b_board (title, contents, id, atch_file_id)
+		VALUES (#{title},#{contents},#{id},#{atch_file_id}) 
 	</insert>
 	
 	<!-- 수정 -->
@@ -91,7 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 검색 -->
 	<select id="searchList" resultType="boardDTO">
-		SELECT b.num, b.title, u.name, date_format(b.date, '%Y-%m-%d') as date, b.count, b.id 
+		SELECT b.num, b.title, u.name, date_format(b.date, '%Y-%m-%d') as date, b.count, b.id, b.atch_file_id 
 		FROM b_board as b
 		INNER JOIN b_users as u
 		ON (b.id = u.id)
