@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -119,19 +120,13 @@ public class BoardController {
 		}
 	}
 	
-	// 게시글 상세 내역
+	// 게시글 상세 내역 : 다중 업로드 적용
 	@RequestMapping(value="/boardRead/{num}")
 	public String boardRead(Model model, @PathVariable int num) {
 		BoardDTO boardDTO = boardService.read(num);
-		Logger.info("READ !! ORI FILE NAME ....." + boardDTO.getOri_name());
-		Logger.info("READ !! NAME ....." + boardDTO.getName());
-		Logger.info("READ !! TITLE ....." + boardDTO.getTitle());
-		
-//		FileDetail file = new FileDetail();
-//		file.setAtch_file_id(boardDTO.getAtch_file_id());
-//		file = filesService.findFileDetail(file);
-		
+		List<FileDetail> fileDetailList = filesService.findFileDetailList(boardDTO.getAtch_file_id());
 		model.addAttribute("boardDTO", boardDTO);
+		model.addAttribute("fileDetailList", fileDetailList);
 		return "boardRead";
 	}
 	
@@ -143,7 +138,8 @@ public class BoardController {
 		return "boardWrite";
 	}
 	
-	// 게시글 작성
+	/*
+	// 게시글 작성 : 단일 업로드 버전 
 	// Hibernate-validator까지 처리한 코드
 	// MultipartFile을 이용하면 View에서 enctype="multipart/form-data" 처리한 폼의 파일 정보를 받을 수 있다.
 	// MultipartFile의 각종 메서드 사용
@@ -153,7 +149,7 @@ public class BoardController {
 		if(bindingResult.hasErrors()) {
 			return "boardWrite"; // ViewResolver로 보냄
 		} else {
-			/* uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 */  
+			// uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 
 			FileMaster fileMaster = new FileMaster();
 			FileDetail fileDetail = new FileDetail();
 			
@@ -171,6 +167,7 @@ public class BoardController {
 			
 			// 파일 세부 사항
 			fileDetail.setAtch_file_id(atch_file_id);
+			fileDetail.setFile_sn(file_sn);
 			fileDetail.setOri_name(file.getOriginalFilename());
 			fileDetail.setSave_name(save_name);
 			fileDetail.setSave_path(uploadPath);
@@ -184,6 +181,58 @@ public class BoardController {
 			filesService.insertFileDetail(fileDetail);
 			boardService.write(boardDTO);
 			return "redirect:/boardSearchList"; // 새글을 반영하기 위해 컨트롤러로 보냄
+		}
+	}
+	*/
+	
+	// 게시글 작성 : 다중 업로드 버전
+	// Hibernate-validator까지 처리한 코드
+	// MultipartHttpServletRequest mtfRequest를 사용
+	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
+	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session, MultipartHttpServletRequest mtfRequest, Model model) throws Exception {
+		if(bindingResult.hasErrors()) {
+			return "boardWrite"; // ViewResolver로 보냄
+		} else {
+			// file_sn 키 값 증가를 위한 변수 
+			int file_sn = 0;
+			
+			// uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 
+			FileMaster fileMaster = new FileMaster();
+			FileDetail fileDetail = new FileDetail();
+			
+			// getFiles안의 키값은 input multiple을 적용한 name값을 적으면 됩니다.
+			List<MultipartFile> fileList = mtfRequest.getFiles("file");
+			
+			// 다중 파일이더라도 키값은 하나로 동일하고 file_sn만 따로 주면됨
+			String atch_file_id = checkAtchFileId();
+			
+			// FileMaster 키값 설정
+			fileMaster.setAtch_file_id(atch_file_id);
+			filesService.insertFileMaster(fileMaster);
+			
+			// 게시판
+			boardDTO.setAtch_file_id(atch_file_id);
+			boardDTO.setId((String)session.getAttribute("id"));
+			
+			for (MultipartFile mf : fileList) {
+				String save_name = uploadFile(mf);
+				model.addAttribute("save_name", save_name);
+				
+				// 파일 세부 사항
+				fileDetail.setAtch_file_id(atch_file_id);
+				fileDetail.setFile_sn(file_sn);
+				fileDetail.setOri_name(mf.getOriginalFilename());
+				fileDetail.setSave_name(save_name);
+				fileDetail.setSave_path(uploadPath);
+				fileDetail.setFile_size((int)mf.getSize());
+				
+				filesService.insertFileDetail(fileDetail);
+				Logger.info("file_sn ..... " + String.valueOf(file_sn));
+				file_sn++;
+			}				
+			
+			boardService.write(boardDTO);
+			return "redirect:/boardSearchList"; 
 		}
 	}
 	
@@ -232,15 +281,17 @@ public class BoardController {
 		list = boardService.list();
 		boolean flag = true;
 		String atch_file_id = null;
-		while(flag) {
-			atch_file_id = makeAtchFileId();
-			for(BoardDTO board : list) {
-				if(!atch_file_id.equals(board.getAtch_file_id())) {
-					flag = false;
-				} else flag = true;
+		if(!list.isEmpty()) {
+			while(flag) {
+				atch_file_id = makeAtchFileId();
+				for(BoardDTO board : list) {
+					if(!atch_file_id.equals(board.getAtch_file_id())) {
+						flag = false;
+					} else flag = true;
+				}
 			}
-		}
-		return atch_file_id;
+			return atch_file_id;
+		} else return atch_file_id = makeAtchFileId();
 	}
 	
 	// 게시글 수정권한 판단

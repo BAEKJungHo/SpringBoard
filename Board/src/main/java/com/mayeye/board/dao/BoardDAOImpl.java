@@ -59,8 +59,6 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public BoardDTO select(int num) {
 		BoardDTO dto = (BoardDTO)sqlSessionTemplate.selectOne("boardDAO.select", num);
-		Logger.info("DAOImpl.....  ORI_NAME ....." + dto.getOri_name());
-		Logger.info("DAOImpl.....  name ....." + dto.getName());
 		return dto;
 	}
 	

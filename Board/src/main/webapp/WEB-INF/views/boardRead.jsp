@@ -24,10 +24,12 @@
 			<th>조회수</th>
 			<td>${boardDTO.count}</td>
 		</tr>	
+		<c:forEach var="file" items="${fileDetailList}" varStatus="loop">
 		<tr>
-			<th>첨부파일</th>
-			<td><a href="<c:url value="/fileDownload/${boardDTO.num}" />">${boardDTO.ori_name}</a></td>
+				<th>첨부파일${loop.count}</th>
+				<td><a href="<c:url value="/fileDownload/${boardDTO.num}" />">${file.ori_name}</a></td>
 		</tr>
+		</c:forEach>
 	</table>
 	<div>
 		<a href="<c:url value="/boardEdit/${boardDTO.num}" />">수정</a>

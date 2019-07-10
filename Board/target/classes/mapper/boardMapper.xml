@@ -19,7 +19,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	]]>
 	</select>
 	
-	
 	<!-- 게시물 전체 수 가져오기 -->
 	<select id="boardCount" resultType="int">
 		SELECT count(*) 
@@ -51,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 해당 게시글 보기 -->
 	<select id="select" parameterType="int" resultType="boardDTO">
 	<![CDATA[
-		SELECT b.num, b.title, u.name, b.date, b.count, b.contents, b.id, b.atch_file_id, f.ori_name
+		SELECT DISTINCT b.num, b.title, u.name, b.date, b.count, b.contents, b.id, b.atch_file_id
 		FROM b_board as b
 		INNER join b_users as u
 		ON (b.id = u.id)

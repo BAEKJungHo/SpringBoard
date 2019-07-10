@@ -29,7 +29,11 @@
 				</td>
 			</tr>
 			<tr>
-				<td><input type="file" name="file" /></td>
+				<!-- 단일 업로드 버전 -->
+				<!-- <td><input type="file" name="file" /></td> -->
+				
+				<!-- 다중 업로드 버전 -->
+				<td><input multiple="multiple" type="file" name="file" /></td>
 			</tr>
 		</table>
 		<div>

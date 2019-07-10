@@ -11,6 +11,6 @@ public interface FilesDAO {
 	public List<Map<String, Object>> selectFileDetailList(Map<String, Object> map);
 	public void insertFileMaster(FileMaster fileMaster);
 	public void insertFileDetail(FileDetail fileDetail);
-	public FileDetail findFileDetail(FileDetail file);
+	public List<FileDetail> findFileDetailList(String atch_file_no);
 	
 }

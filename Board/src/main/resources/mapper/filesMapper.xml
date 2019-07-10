@@ -7,8 +7,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="filesDAO">
 	<!-- FileDetail Insert -->
 	<insert id="insertFileDetail" parameterType="fileDetail">
-		INSERT INTO b_filedetail (atch_file_id, ori_name, save_name, save_path, file_size)
-		VALUES (#{atch_file_id},#{ori_name},#{save_name},#{save_path},#{file_size}) 
+		INSERT INTO b_filedetail (atch_file_id, file_sn, ori_name, save_name, save_path, file_size)
+		VALUES (#{atch_file_id},#{file_sn},#{ori_name},#{save_name},#{save_path},#{file_size}) 
 	</insert>
 	
 	<!-- FileMaster Insert -->
@@ -29,12 +29,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	]]>
 	</select>
 	
-	<select id="findFileDetail" parameterType="fileDetail" resultType="fileDetail">
+	<select id="findFileDetailList" parameterType="String" resultType="fileDetail">
 		<![CDATA[
-			SELECT
-				*
-			FROM B_FILEDETAIL
-			WHERE ATCH_FILE_ID = #{atch_file_id}
+			SELECT m.atch_file_id, f.file_sn, f.ori_name
+			FROM b_filedetail as f
+			INNER JOIN b_filemaster as m
+			ON (f.atch_file_id = m.atch_file_id)
+			WHERE m.atch_file_id = #{atch_file_id}
 		]]>
 	</select>
 </mapper>

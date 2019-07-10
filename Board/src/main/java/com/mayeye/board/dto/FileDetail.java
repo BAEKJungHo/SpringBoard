@@ -3,7 +3,7 @@ package com.mayeye.board.dto;
 public class FileDetail {
 	
 	private String atch_file_id;
-	private String file_sn;
+	private int file_sn;
 	private String ori_name;
 	private String save_name;
 	private String save_path;
@@ -17,14 +17,14 @@ public class FileDetail {
 		this.atch_file_id = atch_file_id;
 	}
 	
-	public String getFile_sn() {
+	public int getFile_sn() {
 		return file_sn;
 	}
-	
-	public void setFile_sn(String file_sn) {
+
+	public void setFile_sn(int file_sn) {
 		this.file_sn = file_sn;
 	}
-	
+
 	public String getOri_name() {
 		return ori_name;
 	}
