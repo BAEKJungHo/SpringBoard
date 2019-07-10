@@ -12,5 +12,6 @@ public interface FilesDAO {
 	public void insertFileMaster(FileMaster fileMaster);
 	public void insertFileDetail(FileDetail fileDetail);
 	public List<FileDetail> findFileDetailList(String atch_file_no);
+	public FileDetail findFileDetail(FileDetail fileDetail);
 	
 }

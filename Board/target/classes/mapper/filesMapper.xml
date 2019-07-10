@@ -38,4 +38,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			WHERE m.atch_file_id = #{atch_file_id}
 		]]>
 	</select>
+	
+	<select id="findFileDetail" parameterType="fileDetail" resultType="fileDetail">
+		<![CDATA[
+			SELECT *
+			FROM b_filedetail
+			WHERE 
+				atch_file_id = #{atch_file_id} 
+			AND 
+				file_sn = #{file_sn}
+		]]>	
+	</select>
 </mapper>

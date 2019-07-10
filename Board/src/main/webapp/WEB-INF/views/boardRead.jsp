@@ -26,8 +26,8 @@
 		</tr>	
 		<c:forEach var="file" items="${fileDetailList}" varStatus="loop">
 		<tr>
-				<th>첨부파일${loop.count}</th>
-				<td><a href="<c:url value="/fileDownload/${boardDTO.num}" />">${file.ori_name}</a></td>
+			<th>첨부파일${loop.count}</th>
+			<td><a href="<c:url value="/fileDownload/${boardDTO.num}/${file.atch_file_id}/${file.file_sn}" />">${file.ori_name}</a></td>
 		</tr>
 		</c:forEach>
 	</table>

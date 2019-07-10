@@ -36,5 +36,10 @@ public class FilesDAOImpl implements FilesDAO {
 	public List<FileDetail> findFileDetailList(String atch_file_no) {
 		return sqlSessionTemplate.selectList("filesDAO.findFileDetailList", atch_file_no);
 	}
+
+	@Override
+	public FileDetail findFileDetail(FileDetail fileDetail) {
+		return sqlSessionTemplate.selectOne("filesDAO.findFileDetail", fileDetail);
+	}
 	
 }

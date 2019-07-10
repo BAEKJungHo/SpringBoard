@@ -35,5 +35,10 @@ public class FilesServiceImpl implements FilesService {
 	public List<FileDetail> findFileDetailList(String atch_file_no) {
 		return filesDAO.findFileDetailList(atch_file_no);
 	}
+
+	@Override
+	public FileDetail findFileDetail(FileDetail fileDetail) {
+		return filesDAO.findFileDetail(fileDetail);
+	}
 	
 }
