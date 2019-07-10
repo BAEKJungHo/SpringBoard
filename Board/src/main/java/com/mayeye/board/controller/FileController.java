@@ -28,12 +28,6 @@ public class FileController {
 	@Autowired
 	private FilesService filesService;
 	
-	/* 객체의 이름이 일치하는 객체 자동주입 
-	* name 속성명에는 IOC 컨테이너에서 설정한 id 명으로 입력 
-	* 스프링 설정 파일을 불러올 때 유용하게 쓰임
-	* name 속성으로 지정한 uploadPath를 사용 할 수 있음
-	*/
-	
 	@RequestMapping(value="/fileDownload/{num}/{atch_file_id}/{file_sn}")
 	public String fileDownload(@PathVariable int num, @PathVariable String atch_file_id, @PathVariable int file_sn, 
 			HttpServletRequest request,HttpServletResponse response) {

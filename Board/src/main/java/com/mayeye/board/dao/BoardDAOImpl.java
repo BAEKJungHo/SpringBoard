@@ -23,15 +23,6 @@ public class BoardDAOImpl implements BoardDAO {
 	@Autowired
 	private SqlSessionTemplate sqlSessionTemplate;
 	
-	
-	// 스프링 4.3 이상이면 
-	// 빈으로 등록되는 클래스에 생성자가 하나만있고
-	// 해당 의존성으로 받는 클래스가 빈으로 등록되있으면 생략가능
-	/*
-	 * @Autowired public BoardDAOImpl (SqlSessionTemplate sqlSessionTemplate) {
-	 * this.sqlSessionTemplate = sqlSessionTemplate; }
-	 */
-	
 	public void setSqlMapClient(SqlSessionTemplate sqlSessionTemplate) {
 		this.sqlSessionTemplate = sqlSessionTemplate;
 	}
@@ -79,16 +70,6 @@ public class BoardDAOImpl implements BoardDAO {
 		return sqlSessionTemplate.selectOne("boardDAO.countBoardList");
 	}
 	
-	/* 검색 원본 
-	@Override
-	public List<BoardDTO> searchList(String searchOption, String keyword) {
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("searchOption", searchOption);
-		map.put("keyword", keyword);
-		return sqlSessionTemplate.selectList("boardDAO.searchList", map);
-	}
-	 */
-
 	// 검색 페이지까지 적용
 	@Override
 	public List<BoardDTO> searchList(SearchCriteria cri) {
