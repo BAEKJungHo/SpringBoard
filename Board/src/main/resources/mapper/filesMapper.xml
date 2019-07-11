@@ -17,24 +17,69 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		VALUES (#{atch_file_id}) 
 	</insert>
 	
+	<!-- 해당 키값의 파일 리스트 구하기 -->
 	<select id="findFileDetailList" parameterType="String" resultType="fileDetail">
 		<![CDATA[
 			SELECT m.atch_file_id, f.file_sn, f.ori_name
 			FROM b_filedetail as f
 			INNER JOIN b_filemaster as m
 			ON (f.atch_file_id = m.atch_file_id)
-			WHERE m.atch_file_id = #{atch_file_id}
+			WHERE m.atch_file_id = #{atch_file_id} 
+			AND m.use_at = 'Y'
 		]]>
 	</select>
 	
+	<!-- 키값과 SN값에 따른 해당 파일의 정보 구하기 -->
 	<select id="findFileDetail" parameterType="fileDetail" resultType="fileDetail">
 		<![CDATA[
-			SELECT *
-			FROM b_filedetail
-			WHERE 
-				atch_file_id = #{atch_file_id} 
-			AND 
-				file_sn = #{file_sn}
-		]]>	
+			SELECT f.atch_file_id, f.file_sn, f.ori_name, f.save_name, f.save_path, f.file_size
+			FROM b_filedetail as f
+			INNER JOIN b_filemaster as m
+			ON (f.atch_file_id = m.atch_file_id)
+			WHERE f.atch_file_id = #{atch_file_id} 
+			AND f.file_sn = #{file_sn} 
+			AND m.use_at = 'Y'
+		]]>
 	</select>
+	
+	<!-- 파일 삭제 + 기존파일에 새로운 파일이 추가될 경우, 
+	기존 파일은 새로운 Key값을 가지게 되므로, 예전(Old) 키, SN 값에 대한 정보 삭제-->
+	<delete id="fileDelete" parameterType="fileDetail">
+		DELETE FROM b_filedetail
+		WHERE atch_file_id = #{atch_file_id} 
+		AND file_sn = #{file_sn}
+	</delete>
+	
+	<!-- master 키값을 이용해서, filedetail의 키값 결과가 0이면 master삭제 -->
+	<delete id="masterDelete" parameterType="String">
+		DELETE FROM b_filemaster
+		WHERE atch_file_id = #{oldKey}
+	</delete>
+	
+	<update id="detailKeyUpdate" parameterType="fileDetail">
+		<![CDATA[
+			UPDATE b_filedetail
+			SET acth_file_id = #{atch_file_id}, file_sn = #{file_sn}
+			WHERE acth_file_id = #{oldKey} 
+			AND file_sn = #{oldSn}
+		]]>
+	</update>
+	
+	<!-- 마스터의 키값 변경 -->
+	<update id="masterKeyUpdate" parameterType="String">
+		UPDATE b_filemaster
+		SET atch_file_id = #{newKey}
+		WHERE atch_file_id = #{atch_file_id}
+	</update>
+	
+	<!-- 파일추가 없이 기존에 있던 파일이 전부 삭제될 경우 -->
+	<!-- BOARD 테이블의 키값을 0으로 변경 -->
+	<!-- 한번 이상 수정된 BOARD 테이블에 새로운 파일이 추가되는 경우 -->
+	<!-- BOARD 테이블의 키값을 New Key 값으로 변경 -->
+	<update id="updateBoardKey" parameterType="fileDetail">
+		UPDATE b_board
+		SET atch_file_id = #{atch_file_id}
+		WHERE num = #{num}
+	</update>
+	
 </mapper>

@@ -17,6 +17,7 @@ public class BoardDTO {
 	private String ori_name; // 원본 파일명 
 	private String atch_file_id;
 	private String del_chk; // 삭제 여부
+	private String oldKey;
 	
 	public int getNum() {
 		return num;
@@ -98,11 +99,19 @@ public class BoardDTO {
 		this.ori_name = ori_name;
 	}
 
+	public String getOldkey() {
+		return oldKey;
+	}
+
+	public void setOldKey(String oldKey) {
+		this.oldKey = oldKey;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardDTO [num=" + num + ", title=" + title + ", count=" + count + ", name=" + name + ", date=" + date
-				+ ", contents=" + contents + ", id=" + id + ", atch_file_id=" + atch_file_id + ", del_chk=" + del_chk
-				+ ", ori_name=" + ori_name + "]";
+				+ ", contents=" + contents + ", id=" + id + ", ori_name=" + ori_name + ", atch_file_id=" + atch_file_id
+				+ ", del_chk=" + del_chk + ", oldKey=" + oldKey + "]";
 	}
 
 }

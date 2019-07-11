@@ -12,7 +12,7 @@
 </head>
 <body>
 <!-- 변경 코드 -->
-	<form:form commandName="boardDTO" mehtod="post">
+	<form:form commandName="boardDTO" mehtod="post" enctype="multipart/form-data">
 		<table border="1">
 			<tr>
 				<th><form:label path="title">제목</form:label></th>
@@ -28,9 +28,18 @@
 					<form:errors path="contents" />
 				</td>
 			</tr>
+			<c:forEach var="file" items="${fileDetailList}" varStatus="loop">
 			<tr>
-				<th><form:hidden path="file_key" /></th>
-				<td><input type="file" name="file" /></td>
+				<th>${file.ori_name}</th>
+				<td><a href="<c:url value="/fileRelease/${boardDTO.num}/${file.atch_file_id}/${file.file_sn}" />" class="btn">삭제하기</a></td>
+			</tr>
+			</c:forEach>
+			<tr>
+				<th>파일 추가</th>
+				<td>
+					<input type="hidden" name="oldKey" value="${oldKey}" />
+					<input multiple="multiple" type="file" name="file" />
+				</td>
 			</tr>
 		</table>
 		<div>

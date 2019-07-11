@@ -40,5 +40,25 @@ public class FilesServiceImpl implements FilesService {
 	public FileDetail findFileDetail(FileDetail fileDetail) {
 		return filesDAO.findFileDetail(fileDetail);
 	}
+
+	@Override
+	public void fileDelete(FileDetail fileDetail) {
+		filesDAO.fileDelete(fileDetail);
+	}
+
+	@Override
+	public void masterDelete(String oldKey) {
+		filesDAO.masterDelete(oldKey);
+	}
+
+	@Override
+	public void updateBoardKey(FileDetail fileDetail) {
+		filesDAO.updateBoardKey(fileDetail);
+	}
+
+	@Override
+	public void detailKeyUpdate(FileDetail fileDetail) {
+		filesDAO.detailKeyUpdate(fileDetail);
+	}
 	
 }

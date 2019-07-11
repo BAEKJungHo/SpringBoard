@@ -1,0 +1,152 @@
+package com.argo.parser;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.fit.pdfdom.PDFDomTree;
+import org.jodconverter.OfficeDocumentConverter;
+import org.jodconverter.office.DefaultOfficeManagerBuilder;
+import org.jodconverter.office.OfficeException;
+import org.jodconverter.office.OfficeManager;
+
+import com.argo.hwp.HwpTextExtractor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.spire.pdf.FileFormat;
+import com.spire.pdf.PdfDocument;
+
+public class JODConverterTest {
+	 
+	private static void generatePDFFromOFFICE(String fileName) {
+		// JODConverter를 사용 : OFFICE TO PDF
+		OfficeManager officeManager = new DefaultOfficeManagerBuilder().build();
+
+		try {
+			officeManager.start();
+			OfficeDocumentConverter converter = new OfficeDocumentConverter(officeManager);
+			converter.convert(new File(fileName), new File("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test1XLSX.pdf")); // pdf
+			officeManager.stop();
+		} catch (OfficeException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void generateHTMLFromPDFUsingPDFBox(String fileName) { 
+		  try { 
+			  PDDocument pdf = PDDocument.load(new File(fileName)); 
+			  Writer output = new PrintWriter("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test1XLSXHTML.html", "utf-8"); // html
+			  new PDFDomTree().writeText(pdf, output);
+			  output.close(); 
+		} catch(Exception e) { e.printStackTrace(); }
+	}
+	
+	private static void generateHTMLFromPDFUsingSpire(String fileName) {
+		// Load PDF
+		PdfDocument pdf = new PdfDocument();
+		pdf.loadFromFile("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test1XLSX.pdf"); // pdf
+		 
+		// Save to HTML
+		pdf.saveToFile("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test1XLSXHTML.html", FileFormat.HTML); // html
+	}
+	
+	private static void hwpConvertText(String path) {
+		File hwp = new File(path); // 텍스트를 추출할 HWP 파일
+		Writer writer = new StringWriter(); // 추출된 텍스트를 출력할 버퍼
+		try {
+			HwpTextExtractor.extract(hwp, writer);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} // 파일로부터 텍스트 추출
+		String text = writer.toString(); // 추출된 텍스트
+		try {
+			File file = new File("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\hwpTxt.txt");
+			if(!file.exists()) { // 해당 경로에 파일이 존재하지 않으면
+			  file.createNewFile(); // 파일생성
+			}
+			FileWriter fw = new FileWriter("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\hwpTxt.txt");
+			char[] data = text.toCharArray();
+			
+			for(int i=0; i<data.length; i++) {
+				fw.write(data[i]);
+			}
+			fw.flush();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	private static void generatePDFFromText(String fileName) {
+		// PDF 파일, 버전 및 출력 파일의 크기를 정의
+		Document pdfDoc = new Document(PageSize.A4);
+		try {
+			PdfWriter.getInstance(pdfDoc, new FileOutputStream("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\hwptestPDF.pdf"))
+			  .setPdfVersion(PdfWriter.PDF_VERSION_1_7);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		pdfDoc.open();
+		
+		// 글꼴과 새 단락을 생성하는 데 사용되는 명령을 정의
+		Font myfont = new Font();
+		myfont.setStyle(Font.NORMAL);
+		myfont.setSize(11);
+		try {
+			pdfDoc.add(new Paragraph("\n"));
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		
+		// 마지막으로 새로 만든 PDF 파일에 단락을 추가
+		BufferedReader br;
+		String strLine;
+		
+		try {
+			br = new BufferedReader(new FileReader(fileName));
+			while ((strLine = br.readLine()) != null) {
+				Paragraph para = new Paragraph(strLine + "\n", myfont);
+				para.setAlignment(Element.ALIGN_JUSTIFIED);
+				pdfDoc.add(para);
+			}
+			pdfDoc.close();
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void main(String[] args) {
+		// OFFICE TO PDF
+		generatePDFFromOFFICE("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test1.xlsx"); // office 
+		
+		// PDF TO HTML USING SPIRE
+		//generateHTMLFromPDFUsingSpire("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test7XLSX.pdf"); // pdf
+		
+		// PDF TO HTML USING PDFBOX
+		generateHTMLFromPDFUsingPDFBox("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test1XLSX.pdf"); // pdf
+		
+		// HWP TO TEXT
+		hwpConvertText("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\hwptest.hwp"); // hwp
+		
+		// TEXT TO PDF
+		generatePDFFromText("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\hwpTxt.txt"); // txt
+	}
+}

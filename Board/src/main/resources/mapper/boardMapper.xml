@@ -56,8 +56,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ON (b.id = u.id)
 		inner join b_filemaster as m
 		on (b.atch_file_id = m.atch_file_id)
-		inner join b_filedetail as f 
-		on (m.atch_file_id = f.atch_file_id)
 		WHERE del_chk = 'N' AND num = #{num}
 		ORDER BY num DESC
 	]]>
@@ -78,12 +76,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 조회수 증가 -->
 	<update id="updateCount" parameterType="int">
-		UPDATE b_board SET
-		count = count+1
+		UPDATE b_board 
+		SET count = count+1
 		WHERE num = #{num}
 	</update>
 	
-	<!-- 삭제 : 상태값 -->
+	<!-- 삭제 : 게시판 상태값 -->
 	<delete id="delete" parameterType="boardDTO">
 	<![CDATA[
 		UPDATE b_board SET del_chk = 'Y'

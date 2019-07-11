@@ -24,7 +24,6 @@ public class FilesDAOImpl implements FilesDAO {
 	@Override
 	public void insertFileMaster(FileMaster fileMaster) {
 		sqlSessionTemplate.insert("filesDAO.insertFileMaster", fileMaster);
-		
 	}
 
 	@Override
@@ -40,6 +39,26 @@ public class FilesDAOImpl implements FilesDAO {
 	@Override
 	public FileDetail findFileDetail(FileDetail fileDetail) {
 		return sqlSessionTemplate.selectOne("filesDAO.findFileDetail", fileDetail);
+	}
+
+	@Override
+	public void fileDelete(FileDetail fileDetail) {
+		sqlSessionTemplate.update("filesDAO.fileDelete", fileDetail);
+	}
+
+	@Override
+	public void masterDelete(String oldKey) {
+		sqlSessionTemplate.delete("filesDAO.masterDelete", oldKey);
+	}
+
+	@Override
+	public void updateBoardKey(FileDetail fileDetail) {
+		sqlSessionTemplate.update("filesDAO.updateBoardKey", fileDetail);
+	}
+
+	@Override
+	public void detailKeyUpdate(FileDetail fileDetail) {
+		sqlSessionTemplate.update("filesDAO.detailKeyUpdate", fileDetail);
 	}
 	
 }

@@ -1,0 +1,61 @@
+package com.argo.parser;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.Writer;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.fit.pdfdom.PDFDomTree;
+import org.jodconverter.OfficeDocumentConverter;
+import org.jodconverter.office.DefaultOfficeManagerBuilder;
+import org.jodconverter.office.OfficeException;
+import org.jodconverter.office.OfficeManager;
+
+import com.spire.pdf.FileFormat;
+import com.spire.pdf.PdfDocument;
+
+public class JODConverterTest {
+	 
+	private static void generatePDFFromOFFICE(String fileName) {
+		// JODConverter¸¦ »ç¿ë : OFFICE TO PDF
+		OfficeManager officeManager = new DefaultOfficeManagerBuilder().build();
+
+		try {
+			officeManager.start();
+			OfficeDocumentConverter converter = new OfficeDocumentConverter(officeManager);
+			converter.convert(new File(fileName), new File("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\testXLSX.pdf")); // pdf
+			officeManager.stop();
+		} catch (OfficeException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void generateHTMLFromPDFUsingPDFBox(String fileName) { 
+		  try { 
+			  PDDocument pdf = PDDocument.load(new File(fileName)); 
+			  Writer output = new PrintWriter("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\testXLSXHTML.html", "utf-8"); // html
+			  new PDFDomTree().writeText(pdf, output);
+			  output.close(); 
+		} catch(Exception e) { e.printStackTrace(); }
+	}
+	
+	private static void generateHTMLFromPDFUsingSpire(String fileName) {
+		// Load PDF
+		PdfDocument pdf = new PdfDocument();
+		pdf.loadFromFile("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\testXLSX.pdf"); // pdf
+		 
+		// Save to HTML
+		pdf.saveToFile("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\testXLSXHTML.html", FileFormat.HTML); // html
+	}
+	
+	public static void main(String[] args) {
+		// OFFICE TO PDF
+		generatePDFFromOFFICE("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\test.xlsx"); // office 
+		
+		// PDF TO HTML USING SPIRE
+		generateHTMLFromPDFUsingSpire("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\testXLSX.pdf"); // pdf
+		
+		// PDF TO HTML USING PDFBOX
+		//generateHTMLFromPDFUsingPDFBox("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\testXLSX.pdf"); // pdf
+	}
+}

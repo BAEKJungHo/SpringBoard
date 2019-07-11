@@ -1,0 +1,274 @@
+> 핵심 : APACHE POI 사용
+
+
+오피스(hwp, xlsx, pdf, ppt, pptx 등) 파일을 Image로 변환
+
+- https://elfinlas.github.io/2019/01/22/hwp2img-java/
+
+1. 아래한글, MS-Office, PDF파일에서 Text 추출하는 Java 기능 활용
+(http://blog.naver.com/PostView.nhn?blogId=admass&logNo=220533424691)
+
+첫 번째로 오피스 파일을 텍스트로 변환하여 추출 
+
+2. 텍스트 파일을 Image로 변환 
+(https://sunghs.tistory.com/36)
+
+
+========================================================================
+pdf box-1.8.10.jar를 사용하여 pdf파일을 이미지로 변환
+
+
+
+= 구현 
+
+1. 텍스트파일을 이미지로
+((https://sunghs.tistory.com/36)
+2. pdf를 이미지로
+(https://codeday.me/ko/qa/20190514/545338.html)
+3. ppt를 pdf로(미완)
+(https://stackoverflow.com/questions/8354568/how-to-convert-a-ppt-file-into-pdf-file-in-java)
+4. ppt를 이미지로(표, 차트 성공, but 도형에서 에러발생)
+
+프로그램 순서는 아래와 같습니다.
+
+1. ppt파일 열기
+
+2. ppt파일을 슬라이드쇼로 열기
+
+3. 슬라이드 사이즈 만큼 루프돌기
+
+4. 루프 돌면서 이미지 파일 변환
+
+- 문제사항 poi를 사용할 때 HSSF 쓸 경우, poi-3.9....jar만 있음됨.
+- xssf를 사용해야 하는데 많은 의존성이 필요하다.
+(poi, poi-scratchpad, poi-ooxml) 
+
+버전을 3.12로 사용했더니 HSSF를 사용한다는 오류가 나서 3.9 버전으로 교체 
+
+
+===================== 문제 해결 =====================
+
+ppt와 pptx 변환할 때 주의 점
+
+XMLSlideShow ppt = new XMLSlideShow(is); // pptx 방식
+SlideShow ppt = new SlideShow(is); // ppt 방식
+
+XSLFSlide[] slide = ppt.getSlides(); -> pptx 방식
+Slide[] slide = ppt.getSlides(); -> ppt 방식
+
+=================== 새로운 문제 ======================
+
+문제점) pptx 변환시 표와 차트가 잘 안나온다.
+ppt 변환시 표와 차트는 잘 나오지만 마지막 도형에서 문제가 생긴다.
+
+======================================================
+
+5. pptx를 이미지로 
+(https://gist.github.com/aautar/b3a7f51438a5e478b2f0672d4117a98b)
+(https://m.blog.naver.com/PostView.nhn?blogId=hgp33&logNo=220567612990&proxyReferer=https%3A%2F%2Fwww.google.com%2F)
+(https://okky.kr/article/376350)
+(https://www.tutorialspoint.com/apache_poi_ppt/apache_poi_ppt_to_image.htm)
+
+단, 컬렉션을 배열 XSLFSlide[] 로 바꾸어 주어야 한다.
+
+문제점) pptx 변환시 표와 차트가 잘 안나온다.
+ppt 변환시 표와 차트는 잘 나오지만 마지막 도형에서 문제가 생긴다.
+
+6. 엑셀을 이미지로 
+(https://devofhwb.tistory.com/72)
+
+7. 엑셀을 pdf로 - Aspose.Cells for Java / jofficeconvert
+(iText 라이브러리)
+(https://stackoverflow.com/questions/7581635/java-excel-to-pdf-conversion)
+(https://www.quora.com/How-do-I-convert-XLSX-to-PDF-in-Java)
+
+8. html 텍스트를 pdf로 변환(iText 사용)
+(https://zero-gravity.tistory.com/251)
+(https://shonm.tistory.com/category/JAVA/PDF%20%EB%B3%80%ED%99%98)
+(https://docs.aspose.com/display/cellsjava/Converting+Workbook+to+Different+Formats#ConvertingWorkbooktoDifferentFormats-ConvertingExceltoPDFFiles)
+(https://github.com/aspose-cells/Aspose.Cells-for-Java)
+
+
+9. hwp to img(WKHtmltopdf를 사용하여 html을 pdf로 변환)
+(https://elfinlas.github.io/2019/01/25/install-wkhtmlpdf/)
+
+10. hwp to text
+(https://github.com/ddoleye/java-hwp)
+
+======================================================
+JODConverter 사용하여 오피스 변환(한글은 안됨)
+(http://www.egovframe.go.kr/wiki/doku.php?id=egovframework:%ED%8C%8C%EC%9D%BC%EB%B3%80%ED%99%98)
+(http://www.mimul.com/pebble/default/2011/02/08/1297164938882.html)
+
+
+1. 조드컨버터 메이븐 라이브러리에 추가(JODConverter 4.0.0 ver)
+2. 오픈오피스 설치 (OOo_3.3.0_Win_x86_install-wJRE_ko.exe)
+
+== 조드컨버터 메이븐 라이브러리
+
+	   <!-- https://mvnrepository.com/artifact/org.jodconverter/jodconverter-core -->
+		<dependency>
+    		<groupId>org.jodconverter</groupId>
+   		    <artifactId>jodconverter-core</artifactId>
+   		    <version>4.0.0-RELEASE</version>
+		</dependency>
+
+==
+
+== 소스 (https://imover.tistory.com/m/93?category=222244)
+= 유용한 예제 (https://www.programcreek.com/java-api-examples/?api=org.apache.pdfbox.util.PDFTextStripper)
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.Writer;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.fit.pdfdom.PDFDomTree;
+import org.jodconverter.OfficeDocumentConverter;
+import org.jodconverter.office.DefaultOfficeManagerBuilder;
+import org.jodconverter.office.OfficeException;
+import org.jodconverter.office.OfficeManager;
+
+public class JODConverterTest {
+	
+	public static void main(String[] args) {
+		JODConverterTest jc = new JODConverterTest();
+		
+		// JODConverter를 사용 : OFFICE TO PDF
+		OfficeManager officeManager = new DefaultOfficeManagerBuilder().build();
+
+		try {
+			officeManager.start();
+			OfficeDocumentConverter converter = new OfficeDocumentConverter(officeManager);
+			converter.convert(new File("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\pptA.ppt"), new File("C:\\Users\\MAYEYE\\Desktop\\workspace\\file\\pptA.pdf"));
+			officeManager.stop();
+		} catch (OfficeException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+==
+
+4.0.0 release 버전
+
+ppt -> pdf 변환 성공
+
+pptx -> pdf 변환 성공 but(몇가지 잘 안나오는게 있음)
+
+xlsx test -> pdf 변환 성공
+
+xlsx test1 -> pdf변환 성공 but(몇가지 잘 안나오는게 있음)
+
+...  등등 
+
+
+4.2.2 버전으로 해봤는데 위 소스코드가 완전히 먹히지 않음
+
+
+
+============================
+★★★ pdf를 html로 떨구기 등등(pdf 파일변환)
+(https://www.baeldung.com/pdf-conversions-java)
+
+pdfbox 1.8.10
+
+	   <dependency>
+	       <groupId>org.apache.pdfbox</groupId>
+	       <artifactId>pdfbox</artifactId>
+	       <version>1.8.10</version>
+	   </dependency>
+
+fontbox
+	   <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/fontbox -->
+		<dependency>
+		    <groupId>org.apache.pdfbox</groupId>
+		    <artifactId>fontbox</artifactId>
+		    <version>1.8.5</version>
+		</dependency>
+
+기타 참고 사이트
+(https://www.mkyong.com/java/pdfbox-how-to-read-pdf-file-in-java/)
+
+docx는 아예 오류가 발생
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+오피스, 한글의 파일 변환은 조드컨버터를 사용하여 pdf로 변환(한글 제외)하고나서
+pdf를 html로 떨구거나 이미지로 변환해야할 때에는 https://www.baeldung.com/pdf-conversions-java 이용
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+
+
+★ pdf를 html로 떨구기(Free Spire.PDF for Java)
+(https://www.e-iceblue.com/Introduce/free-pdf-for-java.html#.XRvzIugzaUk)
+(https://www.e-iceblue.com/Tutorials/Licensing/How-to-install-Spire.PDF-for-Java-from-Maven-Repository.html) <- 메이븐
+(https://www.quora.com/How-do-I-convert-from-PDF-to-HTML-using-Java)
+
+무료 버전은 PDF 10 페이지로 제한됩니다. 
+이 제한은 PDF 작성 중에 적용됩니다. PDF를 Image, XPS, Word, HTML로 변환 할 때 파일의 처음 10 페이지 만 가져올 수 있습니다. 
+Spire.PDF의 상용 버전으로 업그레이드 하십시오 .
+
+- 소스
+
+//Load PDF
+PdfDocument pdf = new PdfDocument();
+pdf.loadFromFile("Input.pdf");
+ 
+//Save to HTML
+pdf.saveToFile("ToHTML.html", FileFormat.HTML);
+
+
+============ 에러 
+
+ClassNotFoundException :   
+
+클래스 로더가 클래스 패스에서 해당 클래스를 못 찾으면 발생한다. 이 에러가 발생하면 기본적으로 클래스 패스와 
+
+그 패스에 해당 클래스가 존재하는지 확인해야한다.
+
+
+
+NoClassDefFoundError :
+
+이것이 발생하면 이유를 찾기가 꽤나 골치아퍼 지는데, 이것은 컴파일타임때 요구되는 클래스가 존재하지만 
+
+런타임때 클래스들이 바뀌거나, 제거되거나, 클래스의 스태틱 초기화가 예외를 던지면 이것이 발생한다. 
+
+먼 소리냐하면 클래스패스에 클래스가 존재하더라도, 이 클래스에 요구되는 클래스들중 하나에 문제가 생겼다는 
+
+이야기이다. 따라서 이 클래스와 의존관계를 맺는 모든것들을 살펴봐야한다
+
+
+출처: https://hamait.tistory.com/348 [HAMA 블로그]
+
+
+
+== 의존성 
+	   <dependency>
+	       <groupId>org.apache.pdfbox</groupId>
+	       <artifactId>pdfbox</artifactId>
+	       <version>1.8.10</version>
+	   </dependency>
+
+
+	   <dependency>
+	       <groupId>org.apache.poi</groupId>
+	       <artifactId>poi</artifactId>
+	       <version>3.9</version>
+	   </dependency>
+	
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>3.9</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-scratchpad</artifactId>
+		    <version>3.9</version>
+		</dependency>
+
+
+문제는 의존성 라이브러리에서 충돌이 일어난듯

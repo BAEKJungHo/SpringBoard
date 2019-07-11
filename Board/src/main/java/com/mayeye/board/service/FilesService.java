@@ -13,5 +13,9 @@ public interface FilesService {
 	public void insertFileDetail(FileDetail fileDetail);
 	public List<FileDetail> findFileDetailList(String atch_file_no);
 	public FileDetail findFileDetail(FileDetail fileDetail);
-
+	public void fileDelete(FileDetail fileDetail);	
+	public void masterDelete(String oldKey);
+	public void updateBoardKey(FileDetail fileDetail);
+	public void detailKeyUpdate(FileDetail fileDetail);
+	
 }

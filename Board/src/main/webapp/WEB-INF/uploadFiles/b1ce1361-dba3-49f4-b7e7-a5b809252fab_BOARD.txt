@@ -1,0 +1,276 @@
+< Spring을 이용한 게시판 만들기 >
+Vscode
+http://localhost:8080/board/boardList
+게시판 구현시 기준 : 한국조폐공사 게시판
+
+- 구현 목표 
+1. 게시글 목록
+2. 등록(CREATE)
+3. 읽기(READ)
+4. 수정(UPDATE)
+5. 삭제(DELETE)
+6. 페이징
+7. 검색
+8. 첨부파일 2개 이상
+
+=============================
+
+- 개발환경
+- STS 3.9
+- Spring 4.3.3 release
+- DBeaver
+- 이클립스
+- MySQL, MyBatis
+- open JDK 1.8
+- tomcat 8.5 
+- junit 4.12
+- jstl 1.2
+- jsp-api 2.2
+- servlet-api 2.5
+- mysql-connector 6.0.5
+- mybatis 3.4.1
+- mybatis-spring 1.3.0
+
+=============================
+
+mysql 원격 접속 정보
+
+- ip : 192.168.10.20
+- port : 3307
+- id : mayeye
+- pwd : apdldkdl@@
+
+=============================
+
+view 파일 정보 
+
+board_list - 게시판 메인페이지 
+board_Insert - 게시글 작성 페이지
+board_update - 게시글 수정 페이지
+board_detail - 게시글 제목 클릭시 나오는 상세 페이지
+
+=============================
+
+테이블 desc 
+
+게시물 번호, 제목, 조회수, 작성일, 내용
+
+ CREATE TABLE b_board (
+  	num int(6) unsigned NOT NULL AUTO_INCREMENT,
+ 	title varchar(50) NOT NULL,
+	count int(5) unsigned, 
+  	date date NOT NULL DEFAULT current_date,
+  	contents varchar(250),
+  	id varchar(20) not null default '',
+  	PRIMARY KEY (num),
+  	foreign key (id) references b_users(id)
+  ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+시간 변경 
+
+alter session set nls_date_format = 'YYYY/MM/DD
+
+
+=====================
+
+스프링 mysql mybatis 세팅
+https://all-record.tistory.com/175
+
+Junit 버전을 4.7 -> 4.12로 낮춤
+
+
+======= 진행과정
+
+1. 개발환경 세팅
+- mybatis, mysql 세팅
+1. dataSource 
+2. sqlSessionFactory (사용 이유 : https://emflant.tistory.com/38)
+3. sqlSessionTemplate
+4. src/main/resources/mapper/config 에 mybatis 설정 파일인 mybatis-config.xml 작성
+- boardmapper.xml 생성(src/main/resources/com/xxx/mapper)
+- samplemapper.xml 생성(src/main/resources/com/xxx/mapper)
+- connection test(mysql, mybatis) (src/test/java/com.xxx.board)
+5. web.xml 한글세팅
+
+★ Mapper.xml의 resultType과 parameterType은 첫글자를 소문자로 바꾼후에 쓰면된다.
+ex) public BoardDTO select(int num) <- DAOIMPL
+ex) <select id="boardList" resultType="boardDTO>
+2. 테이블 생성
+3. 패키지 구성 
+4. DTO 생성
+5. DAO 인터페이스와 IMPL 생성
+6. service 인터페이스와 impl 생성
+7. 컨트롤러 생성
+8. 게시글 목록 구현(view, controller 메소드)
+9. 읽기 구현
+10. 글쓰기 구현
+11. 수정 구현 - 세션 사용
+12. 삭제 구현
+13. 로그인 구현 (id, pw, table)
+14. 첨부파일
+
+★ 세션을 이용
+- MVC 컨트롤러에 @SessionAttributes("Session에 저장할 객체명") 어노테이션을 지정한다.
+- 세션에서 저장한 객체를 활용하는 edit() 메서드의 인자에 @ModelAttribute 어노테이션을 지정한다.
+즉. @ModelAttribute 어노테이션은 세션에 저장된 객체를 환용한다는 의미도 있음
+- 세션은 서버의 메모리 자원이기 때문에 더 이상 사용하지 않는 세션은 
+- 스프링 MVC가 제공하는 SessionStatus 객체의 setComplete() 메서드를 이용해 필요없는 객체를 세션에서 제거
+
+@SessionAttributes("boardDTO")
+-> boardDTO라는 이름으로 객체가 MVC 모델에 추가될 때 세션에도 boardDTO를 저장하라고 지정한다.
+-> @SessionAttributes에서 boardDTO가 지정된 경우 세션에 의한 바인딩이 먼저 실행되고, 그 후에 HttpServletRequest에 있는 정보로 갱신된다.
+
+model.addAttribute("boardDTO", boardDTO); -> 세션에 boardDTO 자동등록 -> @SessionAttributes("boardDTO") -> 세션에서 boardDTO 자동으로 바인딩(public String xxx(@ModelAttribute)
+-> BoardDTO boardDTO(DTO, 즉 커맨드 객체라고 봐도 무방)로 HttpServletRequest에 의해 자동 바인딩
+public String xxx(@ModelAttribute BoardDTO boardDTO, SessionStauts sessionStatus) {
+	sessionStatus.setComplete(); -> 세션에 저장된 객체 해제
+}
+
+-- (select *from (select max(num)+1 from tbl_board) next),
+
+<!-- 이것은 숫자입력해야할 곳에 문자를 입력한 경우와 같이 바인딩 오류 때 사용 -->
+- BindingResult객체와 내장 메소드인 hasErrors() 메서드 사용
+- boardWrite.jsp View에서 form 태그 라이브러리 사용
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+
+<!-- 이것은 제목, 내용, 작성자, 비빌번호 등 값이 들어오지 않은 경우 오류 처리를 위해 사용 -->
+- 자바에서 지원하는 유효성 검증(Validation)기능 : JSR-303 자바 규약
+- 이 규약을 구현한 하이버 네이트 밸리데이터(hibernate-validator) 사용 
+- 의존성 추가
+
+		<!-- Hibernate-Validator --> 톰캣 8.5 기준
+		<dependency>
+ 	    	<groupId>org.hibernate</groupId>
+    		<artifactId>hibernate-validator</artifactId>
+    		<version>4.3.1.Final</version>
+		</dependency>
+
+하이버네이트를 사용하게 되면 POST 방식의 boardWrite 메서드에도 살짝 변화가 필요하다
+그리고 DTO에서도 @Length, @NotEmpty 등이 어노테이션을 통해 검증 기능 적용 가능
+
+★ BindingResult와 Hibernate-validator를 사용하면 자바스크립트에서 검증하는 방법과 똑같다. 어디서 하든 개발자가 선택하여 사용
+
+★ ViewResolver로 보내는 방식 : reutrn "boardWrite"
+★ 컨트롤러로 보내는 방식 : "redirect:/boardList" --> 따라서 컨트롤러의 RequestMapping을 통해 해당 method=RequestMethod.GET메소드 호출
+
+--> POST 요청을 Redirect해서 GET 요청으로 보내는 것을 PRG(POST-Redirect-GET) 패턴이라고 한다.
+
+새글을 작성하거나, 결제, 이체 등을 할 때에는 꼭 PRG 패턴을 적용해야 한다.
+
+만약 적용하지않고 바로 ViewResolver로 가게되면 뷰 힌트가 글작성 View인채로 남아있어 새로 고침을 하게 되면 계속 DB에 저장되게 되면,
+결제나 이체의 경우에는 돈이 계속 빠져나가는 현상이 발생한다. 
+
+따라서 redirect로 boardWrite에서 boardList로 뷰 힌트를 바꿔 줘야, 부작용을 막을 수 있다.
+
+★ 커맨드 객체 vs DTO 
+
+https://codeday.me/ko/qa/20190429/411484.html
+
+
+★ 읽기 구현 할때 스프링 MVC는 SEO(Search Engine Optimization, 검색 엔진 최적화)에 최적화된 URL을 처리할 수 있는 매커니즘을 제공,
+이때 @PathVariable 어노테이션을 사용하면 된다.
+
+★ @RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)에서 num을 경로변수(PathVariable)이라고 하는데, 이것을 메서드의 인자로 사용하려면 @PathVariable 어노테이션을 인자에 지정하면 된다.
+- 오라클 seq(sequence)
+- mysql autoincrement 
+실무에서는 autoincrement를 사용안하는편이 낫다. autoincrement는 mysql에서만 가능하기 때문에
+
+즉, num 자리에는 글 번호와같이 검색에 도움되는 primary key가 오는게 좋다
+
+★ dao와 service의 차이점 (dao vs biz logic 을 생각하면됨)
+하나의 서비스가 다수의 dao와 관계를 맺을 수도 있고 다수의 서비스가 하나의 dao와 관계를 맺을 수도 있지만
+대부분은 하나의 service와 하나의 dao만 관계를 맺는다.
+
+★ 서비스가 존재하는 이유
+컨트롤러와 dao가 직접 통신하기에는 dao에 crud를 제외한 많은 로직들이 담게 될 수 있으므로 
+중간역할인 service를 넣어서 dao는 온전히 crud기능만 담당할 수 있게 하기 위해
+
+그리고 서비스에서 list라는 메소드에 대한 쿼리문을 다르게 하여 확장성을 키우기 위해
+
+★ dataSource 는 mysql로 jdbc를 연동하여 db와 접속하기 위함
+★ sqlSessionFactory는 mybatis를 사용하기 위해 꼭 필요한 객체
+★ sqlSessionTemplate를 사용하면 원래 jdbc만을 사용하여 쿼리를 짤 경우 try-catch문으로 항상 감싸면서 statement등의 객체를 항상 close()로 닫아줘야 했는데
+sqlSessionTemplate가 SQLException을 RuntimeException으로 바꿔서 Uncheck 즉, 예외처리를 안해줘도 상관 없게 만들어서 try-catch문을 사용하지 않게 됩니다.
+jdbc만을 사용했을때에는 check상태라 예외처리가 필요한 상태이기 때문에 처리를 해준 것입니다.
+
+★ DAOImpl 에는 SqlSessionTemplate 객체를 가지고 있고 자동주입을 해줍니다.
+★ ServiceImpl에서 DAOImpl 객체를 DI 해줘야 할 것 같지만, 사실상 DAOIMPL은 DAO를 구현한 실체 클래스이며, 자식 클래스 이므로 
+DAO를 DI 해주면 되는 것입니다.
+
+★ mybatis-config.xml을 설정하고 서버 실행시 generateKeys라는 오류가 나면 
+<setting name="useGenereateKeys" value="false" /> 태그를 없애야 합니다.
+mybatis 버전에 따라서 위 태그를 사용할 수도 있고, 사용 못할 수도 있습니다.
+
+★ controller부터 db에서 쿼리가 실행 되기까지의 동작 방식은 다음과 같습니다.
+
+Controller -> Service -> DAO(sqlSessionTemplate사용) -> Mapper.xml의 쿼리문을 실행  
+
+★ mapper에서 namespace를 사용하면 다음과 같이 쿼리문을 호출 할 수 있습니다.
+
+<mapper namespace="boardDAO">
+	<!-- 게시판 목록 -->
+	<select id="list" resultType="boardDTO">
+		select * from b_board 
+		order by date
+	</select>
+
+
+★ boardDAO.list <-- 방식으로 호출 가능 
+
+
+dao에는 crud에 관한 추상메소드만 가지고 있으면됨
+service는 dao와의 연동 + 서버기술(클라이언트/서버) + db에 종속되지 않는 로직을 구현하는 곳 
+<setting name="useGenereateKeys" value="false" />
+
+★ mapper.xml 쿼리 태그에서 id 속성명은, DAO의 메소드 명과 같아야 합니다. 
+★ 또한 resultType은 앞글자만 소문자로 바꾸면되며, parameterType은 DAO 메소드의 파라미터변수명과 같아야 합니다.
+★ 또한 DAOImpl에서 return sqlSessionTemplate.selectList("list")와 같이  괄호안의 문자열도 mapper.xml id속성명과 DAO의 메소드 명과 같아야 합니다.
+★ selectList는 sqlSessionTemplate의 내장 메소드 이며, list같은 배열이나 컬렉션 값을 받아올때 사용합니다,
+
+★ Exception 관련 링크 : https://www.slipp.net/questions/350
+★ OKKY.kr 창시자 : https://www.youtube.com/KenuHeo
+
+===
+tomcat 8.5 기준 jsp-api 2.1 에서 2.2로 변경
+
+
+===
+boardmapper.xml 작성
+
+Mapper Interface 작성방법은 annotation vs mapper.xml 
+
+mapper class 하나는 mysql 데이터베이스의 테이블 하나와 대응 
+
+mybatis는 xml 파일 또는 annotation을 이용해서 쿼리를 설정하고 db에 접속
+
+
+=================================================================
+페이지 네이션
+=================================================================
+1. PageMaker 클래스 만들기
+	- 전체 게시물 갯수 
+	- 현재 페이지 번호
+	- 한 페이지에 몇개 보일지
+	- 현재 페이지 블록의 시작 페이지
+	- 현재 페이지 블록의 끝 페이지 
+	- 이전 페이지 화살표
+	- 다음 페이지 화살표
+	- 현재 끝 페이지 블록
+	- 끝 페이지 블록
+
+2. Mapper 인터페이스에 함수 만들기 
+	- 전체 자료 개수 가져오기 
+	- 자료 가져오기
+
+3. Mapper.xml에 쿼리문 작성하기
+	- 전체 자료 개수 가져오기
+	- 자료 가져오기
+
+4. Controller 작성하기
+	- PageMaker 객체를 사용해서 함수 호출
+	- mapper도 호출
+	- jsp에 객체 전달
+
+5. View 페이지 작성
+
+

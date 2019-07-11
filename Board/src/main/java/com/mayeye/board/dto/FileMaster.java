@@ -21,11 +21,11 @@ public class FileMaster {
 	public void setCreate_dt(String create_dt) {
 		this.create_dt = create_dt;
 	}
-	
+
 	public String getUse_at() {
 		return use_at;
 	}
-	
+
 	public void setUse_at(String use_at) {
 		this.use_at = use_at;
 	}

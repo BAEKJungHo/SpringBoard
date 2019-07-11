@@ -298,7 +298,12 @@ public class BoardController {
 	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.GET)
 	public String boardEdit(@PathVariable int num, Model model, HttpSession session, RedirectAttributes rttr) {
 		if(session.getAttribute("id").equals(boardService.read(num).getId())) {
-			 model.addAttribute("boardDTO", boardService.read(num));
+			BoardDTO boardDTO = boardService.read(num);
+			List<FileDetail> fileDetailList = filesService.findFileDetailList(boardDTO.getAtch_file_id());
+			
+			model.addAttribute("oldKey", boardDTO.getAtch_file_id());
+			model.addAttribute("boardDTO", boardDTO);
+			model.addAttribute("fileDetailList", fileDetailList);
 			return "boardEdit";	
 		} else {
 			rttr.addFlashAttribute("msg", "수정 권한이 없습니다");
@@ -307,10 +312,64 @@ public class BoardController {
 	}
 	
 	// 수정 검증 : BindingResut + Validator
+	// 파일 추가한 경우 or 기존파일 삭제 + 새로운 파일 추가된 경우
 	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)
-	public String boardEdit(@Valid BoardDTO boardDTO, BindingResult bindingResult) {
+	public String boardEdit(@Valid BoardDTO boardDTO, BindingResult bindingResult, MultipartHttpServletRequest mtfRequest, Model model, HttpSession session) throws Exception {
 		if(bindingResult.hasErrors()) return "boardEdit";
 		else {
+			// file_sn 키 값 증가를 위한 변수 
+			int file_sn = 0;
+			
+			// uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 
+			FileMaster fileMaster = new FileMaster();
+			FileDetail fileDetail = new FileDetail();
+			
+			// 다중 파일이더라도 키값은 하나로 동일하고 file_sn만 따로 주면됨
+			String atch_file_id = checkAtchFileId();
+			
+			// 기존에 존재하던 파일들의 sn값과 키값을 새로 세팅
+			List<FileDetail> fileDetailList = filesService.findFileDetailList(boardDTO.getOldkey());
+			for(FileDetail file : fileDetailList) {
+				file.setOldSn(file.getFile_sn()); // 예전 sn값
+				file.setFile_sn(file_sn); // 새로운 sn값
+				file.setOldKey(boardDTO.getOldkey()); // 예전 키값
+				file.setAtch_file_id(atch_file_id); // 새로운 키값
+				Logger.info("setOldKey : " + file.getOldKey());
+				filesService.detailKeyUpdate(file);
+				file_sn++;
+			}
+			
+			// getFiles안의 키값은 input multiple을 적용한 name값을 적으면 됩니다.
+			// MultipartHttpServletRequest는 방금 업로드한 파일을 가져오는거지, 이미 업로드된 파일을 가져오진 않는다.
+			List<MultipartFile> fileList = mtfRequest.getFiles("file");
+			
+			// FileMaster 키값 설정
+			fileMaster.setAtch_file_id(atch_file_id);
+			filesService.insertFileMaster(fileMaster);
+			
+			for (MultipartFile mf : fileList) {
+				String save_name = uploadFile(mf);
+				model.addAttribute("save_name", save_name);
+				
+				// 파일 세부 사항
+				fileDetail.setAtch_file_id(atch_file_id);
+				fileDetail.setFile_sn(file_sn);
+				fileDetail.setOri_name(mf.getOriginalFilename());
+				fileDetail.setSave_name(save_name);
+				fileDetail.setSave_path(uploadPath);
+				fileDetail.setFile_size((int)mf.getSize());
+				
+				filesService.insertFileDetail(fileDetail);
+				Logger.info("file_sn ..... " + String.valueOf(file_sn));
+				file_sn++;
+			}	
+			
+			// 게시판에 있는 키값 변경
+			filesService.updateBoardKey(fileDetail);
+			
+//			filesService.masterDelete(boardDTO.getOldkey());
+			
+			// 제목 내용 변경
 			boardService.edit(boardDTO);
 			return "redirect:/boardSearchList";
 		}

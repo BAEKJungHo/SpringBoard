@@ -8,6 +8,9 @@ public class FileDetail {
 	private String save_name;
 	private String save_path;
 	private int file_size;
+	private int num; // board 테이블 수정을 위해 추가
+	private String oldKey;
+	private int oldSn;
 	
 	public String getAtch_file_id() {
 		return atch_file_id;
@@ -57,10 +60,28 @@ public class FileDetail {
 		this.file_size = file_size;
 	}
 
-	@Override
-	public String toString() {
-		return "FileDetail [atch_file_id=" + atch_file_id + ", file_sn=" + file_sn + ", ori_name=" + ori_name
-				+ ", save_name=" + save_name + ", save_path=" + save_path + ", file_size=" + file_size + "]";
+	public int getNum() {
+		return num;
 	}
-	
+
+	public void setNum(int num) {
+		this.num = num;
+	}
+
+	public String getOldKey() {
+		return oldKey;
+	}
+
+	public void setOldKey(String oldKey) {
+		this.oldKey = oldKey;
+	}
+
+	public int getOldSn() {
+		return oldSn;
+	}
+
+	public void setOldSn(int oldSn) {
+		this.oldSn = oldSn;
+	}
+
 }
