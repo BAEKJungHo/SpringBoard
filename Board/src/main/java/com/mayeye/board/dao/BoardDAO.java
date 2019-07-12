@@ -17,8 +17,7 @@ public interface BoardDAO {
 	public int updateReadCount(int num);
 	public List<Map<String, Object>> pageList(Criteria cri);
 	public int countBoardList();
-	// public List<BoardDTO> searchList(String searchOption, String keyword);
 	public List<BoardDTO> searchList(SearchCriteria cri);
-	public int countArticle(String searchOption, String keyword);
+	public int countArticle(SearchCriteria cri);
 	public String boardGetKey(int num);
 }

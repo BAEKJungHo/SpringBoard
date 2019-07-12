@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -59,35 +60,28 @@ public class BoardController {
 	
 	/** 게시판 페이징 + 검색 */
 	@RequestMapping(value="/boardSearchList")
-	public ModelAndView list(SearchCriteria cri) {
-		Logger.info("!!!!!search!!!!!");
-		
-		ModelAndView mav = new ModelAndView();
-		
-		int count = boardService.countArticle(cri.getSearchType(), cri.getKeyword());
+	public String boardSearchList(SearchCriteria cri, Model model) {
+		int count = boardService.countArticle(cri);
 		
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
 		pageMaker.setTotalCount(count);
 		
+		// 검색 조건과 페이지에 대한 정보를 리스트로 가져온다.
 		List<BoardDTO> searchList = boardService.searchList(cri);
 		
-		Logger.info("searchType     " + cri.getSearchType());
-		Logger.info("keyword     " + cri.getKeyword());
-		Logger.info("svf     " + String.valueOf(count));
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("searchList", searchList);
-		map.put("count", count);
-		map.put("searchOption", cri.getSearchType());
-		map.put("keyword", cri.getKeyword());
-		mav.addObject("pageMaker", pageMaker);
-		mav.addObject("map", map);
-		return mav;
+		model.addAttribute("searchList", searchList);
+		model.addAttribute("searchType", cri.getSearchType());
+		model.addAttribute("count", count);
+		model.addAttribute("keyword", cri.getKeyword());
+		model.addAttribute("pageMaker", pageMaker);
+		
+		return "boardSearchList";
 	}
 	
 	/** 게시글 상세 내역 : 다중 업로드 적용 */
 	@RequestMapping(value="/boardRead/{num}")
-	public String boardRead(Model model, @PathVariable int num) {
+	public String boardRead(@ModelAttribute SearchCriteria cri, Model model, @PathVariable int num) {
 		BoardDTO boardDTO = boardService.read(num);
 		List<FileDetail> fileDetailList = filesService.findFileDetailList(boardDTO.getAtch_file_id());
 		model.addAttribute("boardDTO", boardDTO);
@@ -130,7 +124,6 @@ public class BoardController {
 			// 파일을 등록하지 않더라도 name값을 따와서 그런지, 파일이 1개 있다고 가정되는듯
 			// View의 폼에 파일 태그가 있으면, 파일객체가 생성되기때문에, 파일을 넣지않아도 1개로 size가 지정됨
 			List<MultipartFile> fileList = mtfRequest.getFiles("file");
-			Logger.info("FileList SIZE : " + String.valueOf(fileList.size())); 
 			
 			// 파일이 빈 값인 경우 0으로 넘어온다.
 			for (MultipartFile file: fileList) {

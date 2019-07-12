@@ -34,7 +34,13 @@
 	<div>
 		<a href="<c:url value="/boardEdit/${boardDTO.num}" />">수정</a>
 		<a href="<c:url value="/boardDelete/${boardDTO.num}" />">삭제</a>
-		<a href="<c:url value="/boardSearchList" />">목록</a>
+		<form id="frm" action="<c:url value="/boardSearchList" />" >
+			<input type="hidden" name="searchType" value="${searchCriteria.searchType }"/>
+			<input type="hidden" name="keyword" value="${searchCriteria.keyword }"/>
+			<input type="hidden" name="page" value="${searchCriteria.page }"/>
+			<input type="hidden" name="perPageNum" value="${searchCriteria.perPageNum }"/>
+			<button>목록</button>
+		</form>
 	</div>
 </body>
 </html>
