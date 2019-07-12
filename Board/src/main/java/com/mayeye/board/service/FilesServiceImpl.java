@@ -60,5 +60,15 @@ public class FilesServiceImpl implements FilesService {
 	public void detailKeyUpdate(FileDetail fileDetail) {
 		filesDAO.detailKeyUpdate(fileDetail);
 	}
+
+	@Override
+	public FileDetail getKeyByNum(int num) {
+		return filesDAO.getKeyByNum(num);
+	}
+
+	@Override
+	public int checkDataToFD(int num) {
+		return filesDAO.checkDataToFD(num);
+	}
 	
 }

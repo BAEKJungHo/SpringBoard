@@ -60,5 +60,14 @@ public class FilesDAOImpl implements FilesDAO {
 	public void detailKeyUpdate(FileDetail fileDetail) {
 		sqlSessionTemplate.update("filesDAO.detailKeyUpdate", fileDetail);
 	}
-	
+
+	@Override
+	public FileDetail getKeyByNum(int num) {
+		return sqlSessionTemplate.selectOne("filesDAO.getKeyByNum", num);
+	}
+
+	@Override
+	public int checkDataToFD(int num) {
+		return sqlSessionTemplate.selectOne("filesDAO.checkDataToFD", num);
+	}
 }

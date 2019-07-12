@@ -80,9 +80,14 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public int countArticle(String searchOption, String keyword) {
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("searchOption", searchOption);
+		map.put("searchType", searchOption);
 		map.put("keyword", keyword);
 		return sqlSessionTemplate.selectOne("boardDAO.countArticle", map);
+	}
+
+	@Override
+	public String boardGetKey(int num) {
+		return sqlSessionTemplate.selectOne("boardDAO.boardGetKey", num);
 	}
 
 }

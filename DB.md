@@ -50,6 +50,7 @@
    	save_name varchar(150) not null, 
    	save_path varchar(2000) not null, 
    	file_size int(10) not null,
+	del_chk char(1) not null default 'N',
    	primary key (atch_file_id, file_sn),
    	foreign key (atch_file_id) references b_filemaster(atch_file_id)
     	) DEFAULT CHARSET=utf8;

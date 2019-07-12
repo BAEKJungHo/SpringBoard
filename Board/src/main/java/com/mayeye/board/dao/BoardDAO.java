@@ -20,5 +20,5 @@ public interface BoardDAO {
 	// public List<BoardDTO> searchList(String searchOption, String keyword);
 	public List<BoardDTO> searchList(SearchCriteria cri);
 	public int countArticle(String searchOption, String keyword);
-
+	public String boardGetKey(int num);
 }

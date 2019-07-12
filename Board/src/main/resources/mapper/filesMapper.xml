@@ -25,7 +25,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			INNER JOIN b_filemaster as m
 			ON (f.atch_file_id = m.atch_file_id)
 			WHERE m.atch_file_id = #{atch_file_id} 
-			AND m.use_at = 'Y'
+			AND f.del_chk = 'N'
+		]]>
+	</select>
+	
+	<!-- filedetail에 데이터가 있는지 확인 -->
+	<select id="checkDataToFD" resultType="int" parameterType="int">
+		<![CDATA[
+			SELECT count(*)
+			FROM b_filedetail as f
+			JOIN b_board as b
+			ON (f.atch_file_id = b.atch_file_id)
+			WHERE b.num = #{num}
+		]]>
+	</select>
+	
+	<!-- num값에 따른 atch_file_key값 가져오기 -->
+	<select id="getKeyByNum" resultType="fileDetail" parameterType="int">
+		<![CDATA[
+			SELECT f.atch_file_id, f.file_sn 
+			FROM b_filedetail as f
+			INNER JOIN b_board as b
+			ON (f.atch_file_id = b.atch_file_id)
+			WHERE b.num = #{num}
+			ORDER BY f.file_sn DESC limit 1		
 		]]>
 	</select>
 	
@@ -42,12 +65,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		]]>
 	</select>
 	
-	<!-- 파일 삭제 + 기존파일에 새로운 파일이 추가될 경우, 
-	기존 파일은 새로운 Key값을 가지게 되므로, 예전(Old) 키, SN 값에 대한 정보 삭제-->
+	<!-- 파일 삭제의 경우 실제 삭제가 되는게 아니라 del_chk 상태 변화 --> 
 	<delete id="fileDelete" parameterType="fileDetail">
-		DELETE FROM b_filedetail
-		WHERE atch_file_id = #{atch_file_id} 
-		AND file_sn = #{file_sn}
+		<![CDATA[
+			UPDATE b_filedetail
+			SET del_chk = 'Y'
+			WHERE atch_file_id = #{atch_file_id} 
+			AND file_sn = #{file_sn}
+		]]>
 	</delete>
 	
 	<!-- master 키값을 이용해서, filedetail의 키값 결과가 0이면 master삭제 -->

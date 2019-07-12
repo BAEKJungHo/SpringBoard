@@ -15,7 +15,11 @@ public class PageMaker {
 	private boolean next;
 	private int displayPageNum = 5;
 	
-	/* 검색 조건과 검색 키워드 처리 */
+	/**
+	 *  검색 조건과 검색 키워드 처리
+	 *  URI 자동 생성 메서드
+	 *  페이지와 페이지번호, 검색 타입과 키워드 조건이 URI에 붙어서 간다. 
+	 */
 	public String makeSearch(int page) {
 		UriComponents uriComponents = UriComponentsBuilder.newInstance()
 			.queryParam("page", page)
@@ -30,7 +34,6 @@ public class PageMaker {
 	/* 검색 키워드 인코딩 처리 */
 	public String encoding(String keyword) {
 		if(keyword == null || keyword.trim().length() == 0) return "";
-		
 		try {
 			return URLEncoder.encode(keyword, "UTF-8");
 		} catch(Exception e) {

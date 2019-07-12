@@ -1,0 +1,72 @@
+1. Hibernate-Validator와 BindingResult는 주로 같이 사용하는지, 2번이 안되는이유
+
+	// 수정 검증 : BindingResut + Validator
+	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)
+	public String boardEdit(@Valid BoardDTO boardDTO, BindingResult bindingResult) {
+		if(bindingResult.hasErrors()) return "boardEdit";
+		else {
+			boardService.edit(boardDTO);
+			return "redirect:/boardList";
+		}
+	}
+
+
+	// 수정 검증 
+	// BindingResult를 빼도 될거 같아서 써봤는데 콘솔창에 에러는 안뜨지만 
+	// 400 - BAD REQUEST 에러가 발생 
+	// error message : The server cannot or will not process the request due to something that is perceived to be a client error 
+	// (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).
+	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)
+	public String boardEdit(@Valid BoardDTO boardDTO, Model model) {
+		if((boardDTO.getContents() == null) || (boardDTO.getTitle() == null)) {
+			model.addAttribute("msg", "제목, 내용을 입력하세요!");
+			model.addAttribute("url", "boardEdit");
+			return "redirect";
+		} else {
+			boardService.edit(boardDTO);
+			return "redirect:/boardList";
+		}
+	}
+
+
+2. SessionAttributes와 @ModelAttribute를 사용하는 이유, 예시 
+
+3. model.addAttribute()의 정확한 역할
+
+	// 게시글 수정권한 판단
+	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.GET)
+	public String boardEdit(@PathVariable int num, Model model, HttpSession session, RedirectAttributes rttr) {
+		if(session.getAttribute("id").equals(boardService.read(num).getId())) {
+			model.addAttribute("boardDTO", boardService.read(num));
+			return "boardEdit";	
+		} else {
+			rttr.addFlashAttribute("msg", "수정 권한이 없습니다");
+			return "redirect:/boardList";
+		}
+	}
+
+	위 코드에서 model.addAttribute("boardDTO", boardService.read(num));를 빼도 될거같은데 빼면 오류가 발생 
+	책에서는 @SessionAttributes와 @ModelAttribute를 사용했는데, 책은 게시물을 작성할 때 비밀번호를 입력하고 수정할때도 입력하는 게시판이고
+	저는 로그인을 통한 게시판이라 차이가 나서 @SessionAttributes와 @ModelAttribute가 쓸모 없어서 빼버리고 위 model.addAttribute도 빼고 싶은데 
+	빼면안되는 이유
+	
+	// 수정 검증 
+	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)
+	public String boardEdit(@Valid BoardDTO boardDTO, Model model) {
+		if((boardDTO.getContents() == null) || (boardDTO.getTitle() == null)) {
+			model.addAttribute("msg", "제목, 내용을 입력하세요!");
+			model.addAttribute("url", "boardEdit");
+			return "redirect";
+		} else {
+			boardService.edit(boardDTO);
+			return "redirect:/boardList";
+		}
+	}
+
+-> form:form을 쓸 때 model.addAttribute("boardDTO", boardService.read(num));로 값이 jsp로 넘어가지 않으면 에러가 발생 
+-> 수정버튼 클릭 -> 컨트롤러 메소드 실행(get) -> model.addAttribute -> jsp 값전달 -> 수정 -> 컨트롤러 메소드 실행(post) 방식
+
+4. 게시글 삭제 오류 
+org.springframework.web.servlet.PageNotFound - Request method 'GET' not supported
+
+get으로 받을 수 없는 이유 

@@ -17,5 +17,7 @@ public interface FilesService {
 	public void masterDelete(String oldKey);
 	public void updateBoardKey(FileDetail fileDetail);
 	public void detailKeyUpdate(FileDetail fileDetail);
+	public FileDetail getKeyByNum(int num);
+	public int checkDataToFD(int num);
 	
 }

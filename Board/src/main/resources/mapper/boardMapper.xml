@@ -14,7 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ON (b.id = u.id)
 		inner join b_filedetail as f 
 		on (b.atch_file_id = f.atch_file_id)
-		WHERE del_chk = 'N'
+		WHERE b.del_chk = 'N'
 		ORDER BY num DESC
 	]]>
 	</select>
@@ -50,17 +50,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 해당 게시글 보기 -->
 	<select id="select" parameterType="int" resultType="boardDTO">
 	<![CDATA[
-		SELECT DISTINCT b.num, b.title, u.name, b.date, b.count, b.contents, b.id, b.atch_file_id
-		FROM b_board as b
-		INNER join b_users as u
-		ON (b.id = u.id)
-		inner join b_filemaster as m
-		on (b.atch_file_id = m.atch_file_id)
-		WHERE del_chk = 'N' AND num = #{num}
-		ORDER BY num DESC
+		SELECT DISTINCT
+			B.NUM, 
+			B.TITLE, 
+			B.DATE, 
+			B.COUNT, 
+			B.CONTENTS, 
+			B.ID, 
+			B.ATCH_FILE_ID,
+			F.atch_file_id,
+			F.del_chk
+		FROM 
+			B_BOARD AS B
+		JOIN B_USERS AS U
+		ON (B.ID = U.ID)
+		LEFT JOIN B_FILEDETAIL F
+		ON (B.ATCH_FILE_ID = F.ATCH_FILE_ID
+			and F.del_chk = 'N')
+		WHERE b.NUM = #{num}
+		and b.DEL_CHK = 'N';
 	]]>
 	</select>
 	
+	<!-- 게시물 번호에 따른 atch_file_key 가져오기 -->
+	<select id="boardGetKey" parameterType="int" resultType="String">
+		<![CDATA[
+			SELECT atch_file_id
+			FROM b_board
+			WHERE num = #{num}		
+		]]>
+	</select>
 	<!-- 삽입(첨부파일 추가)-->
 	<insert id="insert" parameterType="boardDTO">
 		INSERT INTO b_board (title, contents, id, atch_file_id)
@@ -69,9 +88,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 수정 -->
 	<update id="update" parameterType="boardDTO">
-		UPDATE b_board SET title = #{title},
-		contents = #{contents}
-		WHERE num = #{num}
+		<![CDATA[
+			UPDATE b_board SET title = #{title},
+			contents = #{contents}
+			WHERE num = #{num}
+		]]>
 	</update>
 	
 	<!-- 조회수 증가 -->

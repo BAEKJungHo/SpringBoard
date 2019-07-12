@@ -31,13 +31,13 @@
 			<c:forEach var="file" items="${fileDetailList}" varStatus="loop">
 			<tr>
 				<th>${file.ori_name}</th>
-				<td><a href="<c:url value="/fileRelease/${boardDTO.num}/${file.atch_file_id}/${file.file_sn}" />" class="btn">삭제하기</a></td>
+				<td><a href="<c:url value="/fileDelete/${boardDTO.num}/${file.atch_file_id}/${file.file_sn}" />" class="btn">삭제하기</a></td>
 			</tr>
 			</c:forEach>
 			<tr>
 				<th>파일 추가</th>
 				<td>
-					<input type="hidden" name="oldKey" value="${oldKey}" />
+					<input type="hidden" name="num" value="${boardDTO.num}" />
 					<input multiple="multiple" type="file" name="file" />
 				</td>
 			</tr>

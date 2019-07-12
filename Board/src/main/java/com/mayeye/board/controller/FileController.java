@@ -103,27 +103,15 @@ public class FileController {
 	}
 	
 	// 추가없이 파일만 삭제한 경우
-	@RequestMapping(value="/fileRelease/{num}/{atch_file_id}/{file_sn}")
-	public String fileRelease(@PathVariable int num, @PathVariable String atch_file_id, @PathVariable int file_sn, Model model) {
+	@RequestMapping(value="/fileDelete/{num}/{atch_file_id}/{file_sn}")
+	public String fileDelete(@PathVariable int num, @PathVariable String atch_file_id, @PathVariable int file_sn, Model model) {
 		FileDetail fileDetail = new FileDetail();
 		fileDetail.setAtch_file_id(atch_file_id);
 		fileDetail.setFile_sn(file_sn);
 		fileDetail.setNum(num);
 		
-		// 파일 삭제
+		// 파일 삭제에 따른 상태 변화
 		filesService.fileDelete(fileDetail);
-		
-		// 파일 삭제 후에 해당 키값으로 파일이 존재하는지 확인
-		List<FileDetail> fileDetailList = filesService.findFileDetailList(atch_file_id);
-		// 존재 하지 않을경우 board의 키값 변경 및, master 키값 삭제
-		if(fileDetailList.isEmpty()) {
-			filesService.updateBoardKey(fileDetail);
-			// filesService.masterDelete(fileDetail.getAtch_file_id());
-			fileDetailList = filesService.findFileDetailList(atch_file_id);
-		}
-		
-		model.addAttribute("boardDTO", boardService.read(num));
-		model.addAttribute("fileDetailList", fileDetailList);
 		
 		return "redirect:/boardEdit/"+num;
 	}

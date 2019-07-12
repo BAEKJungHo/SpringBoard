@@ -48,7 +48,8 @@ public class BoardController {
 	@Autowired
 	private FilesService filesService;
 	
-	/* 객체의 이름이 일치하는 객체 자동주입 
+	/** @Resource
+	* 객체의 이름이 일치하는 객체 자동주입 
 	* name 속성명에는 IOC 컨테이너에서 설정한 id 명으로 입력 
 	* 스프링 설정 파일을 불러올 때 유용하게 쓰임
 	* name 속성으로 지정한 uploadPath를 사용 할 수 있음
@@ -56,19 +57,21 @@ public class BoardController {
 	@Resource(name="uploadPath")
 	private String uploadPath;
 	
-	// 게시판 페이징 + 검색
+	/** 게시판 페이징 + 검색 */
 	@RequestMapping(value="/boardSearchList")
 	public ModelAndView list(SearchCriteria cri) {
 		Logger.info("!!!!!search!!!!!");
 		
 		ModelAndView mav = new ModelAndView();
 		
+		int count = boardService.countArticle(cri.getSearchType(), cri.getKeyword());
+		
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
-		pageMaker.setTotalCount(boardService.countArticle(cri.getSearchType(), cri.getKeyword()));
+		pageMaker.setTotalCount(count);
 		
 		List<BoardDTO> searchList = boardService.searchList(cri);
-		int count = boardService.countArticle(cri.getSearchType(), cri.getKeyword());
+		
 		Logger.info("searchType     " + cri.getSearchType());
 		Logger.info("keyword     " + cri.getKeyword());
 		Logger.info("svf     " + String.valueOf(count));
@@ -82,45 +85,7 @@ public class BoardController {
 		return mav;
 	}
 	
-	// 게시판 페이징
-	@RequestMapping(value="/boardPageList")
-	public ModelAndView boardPageList(Criteria cri, HttpSession session) {
-		ModelAndView mav = null;
-		if(session.getAttribute("id") == null) {
-			mav = new ModelAndView("redirect");
-			mav.addObject("msg", "잘못된 접근 입니다!!");
-			mav.addObject("url", "login");
-			return mav;
-		} else {
-			mav = new ModelAndView("/boardPageList");
-			PageMaker pageMaker = new PageMaker();
-			pageMaker.setCri(cri);
-			pageMaker.setTotalCount(boardService.countBoardList());
-			
-			List<Map<String, Object>> list = boardService.pageList(cri);
-		
-			mav.addObject("list", list);
-			mav.addObject("pageMaker", pageMaker);
-			
-			return mav;
-		}
-	}
-
-	// 게시판 목록
-	@RequestMapping(value="/boardList")
-	public String boardList(Model model, HttpSession session) {
-		if(session.getAttribute("id") == null) {
-			model.addAttribute("msg", "잘못된 접근입니다!!");
-			model.addAttribute("url", "login");
-			return "redirect";
-		} else {
-			model.addAttribute("boardList", boardService.list());
-			model.addAttribute("user", session.getAttribute("user"));
-			return "boardList";
-		}
-	}
-	
-	// 게시글 상세 내역 : 다중 업로드 적용
+	/** 게시글 상세 내역 : 다중 업로드 적용 */
 	@RequestMapping(value="/boardRead/{num}")
 	public String boardRead(Model model, @PathVariable int num) {
 		BoardDTO boardDTO = boardService.read(num);
@@ -130,127 +95,83 @@ public class BoardController {
 		return "boardRead";
 	}
 	
-	// a태그 혹은 주소창 입력시 들어오는 곳
-	// 바인딩 에러처리를 위해 Model 객체와 model.addAttribute() 추가
+	/** form 커스텀 태그 사용 : 바인딩을 위해 boardDTO 객체를 Model로 담아서 넘겨줌 */
 	@RequestMapping(value="/boardWrite", method=RequestMethod.GET) 
 	public String boardWrite(Model model) {
 		model.addAttribute("boardDTO", new BoardDTO()); 
 		return "boardWrite";
 	}
 	
-	/*
-	// 게시글 작성 : 단일 업로드 버전 
-	// Hibernate-validator까지 처리한 코드
-	// MultipartFile을 이용하면 View에서 enctype="multipart/form-data" 처리한 폼의 파일 정보를 받을 수 있다.
-	// MultipartFile의 각종 메서드 사용
-	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
-	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session, MultipartFile file, Model model) throws Exception {
-		Logger.info("upload POST ..... OriginalName={}, size={}", file.getOriginalFilename(), file.getSize());
-		if(bindingResult.hasErrors()) {
-			return "boardWrite"; // ViewResolver로 보냄
-		} else {
-			// uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 
-			FileMaster fileMaster = new FileMaster();
-			FileDetail fileDetail = new FileDetail();
-			
-			String atch_file_id = checkAtchFileId();
-
-			String save_name = uploadFile(file); 
-			model.addAttribute("save_name", save_name);
-			
-			Logger.info("SAVED FILENAME ....." + save_name);
-			Logger.info("atch_file_id ....." + atch_file_id + " atch length ....." + atch_file_id.length());
-			Logger.info("SAVED PATH ....." + uploadPath);
-			
-			// 파일 마스터 
-			fileMaster.setAtch_file_id(atch_file_id);
-			
-			// 파일 세부 사항
-			fileDetail.setAtch_file_id(atch_file_id);
-			fileDetail.setFile_sn(file_sn);
-			fileDetail.setOri_name(file.getOriginalFilename());
-			fileDetail.setSave_name(save_name);
-			fileDetail.setSave_path(uploadPath);
-			fileDetail.setFile_size((int)file.getSize());
-			
-			// 게시판
-			boardDTO.setAtch_file_id(atch_file_id);
-			boardDTO.setId((String)session.getAttribute("id"));
-			
-			filesService.insertFileMaster(fileMaster);
-			filesService.insertFileDetail(fileDetail);
-			boardService.write(boardDTO);
-			return "redirect:/boardSearchList"; // 새글을 반영하기 위해 컨트롤러로 보냄
-		}
-	}
+	/** 게시글 작성 : 다중 업로드 버전
+	* Hibernate-validator까지 처리한 코드
+	* MultipartHttpServletRequest mtfRequest를 사용
 	*/
-	
-	// 게시글 작성 : 다중 업로드 버전
-	// Hibernate-validator까지 처리한 코드
-	// MultipartHttpServletRequest mtfRequest를 사용
 	@RequestMapping(value="/boardWrite", method=RequestMethod.POST)
 	public String boardWrite(@Valid BoardDTO boardDTO, BindingResult bindingResult, HttpSession session, MultipartHttpServletRequest mtfRequest, Model model) throws Exception {
 		if(bindingResult.hasErrors()) {
 			return "boardWrite"; // ViewResolver로 보냄
 		} else {
-			// file_sn 키 값 증가를 위한 변수 
+			String atch_file_id = checkAtchFileId();
 			int file_sn = 0;
+			
+			// 게시판
+			boardDTO.setId((String)session.getAttribute("id"));
+			boardDTO.setAtch_file_id(atch_file_id);
 			
 			// uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 
 			FileMaster fileMaster = new FileMaster();
 			FileDetail fileDetail = new FileDetail();
 			
-			// getFiles안의 키값은 input multiple을 적용한 name값을 적으면 됩니다.
-			List<MultipartFile> fileList = mtfRequest.getFiles("file");
-			
-			// 다중 파일이더라도 키값은 하나로 동일하고 file_sn만 따로 주면됨
-			String atch_file_id = checkAtchFileId();
-			
-			// FileMaster 키값 설정
+			// 마스터 키값
 			fileMaster.setAtch_file_id(atch_file_id);
 			filesService.insertFileMaster(fileMaster);
 			
-			// 게시판
-			boardDTO.setAtch_file_id(atch_file_id);
-			boardDTO.setId((String)session.getAttribute("id"));
+			// getFiles안의 키값은 input multiple을 적용한 name값을 적으면 됩니다.
+			// 파일을 등록하지 않더라도 name값을 따와서 그런지, 파일이 1개 있다고 가정되는듯
+			// View의 폼에 파일 태그가 있으면, 파일객체가 생성되기때문에, 파일을 넣지않아도 1개로 size가 지정됨
+			List<MultipartFile> fileList = mtfRequest.getFiles("file");
+			Logger.info("FileList SIZE : " + String.valueOf(fileList.size())); 
 			
-			for (MultipartFile mf : fileList) {
-				String save_name = uploadFile(mf);
-				model.addAttribute("save_name", save_name);
-				
-				// 파일 세부 사항
-				fileDetail.setAtch_file_id(atch_file_id);
-				fileDetail.setFile_sn(file_sn);
-				fileDetail.setOri_name(mf.getOriginalFilename());
-				fileDetail.setSave_name(save_name);
-				fileDetail.setSave_path(uploadPath);
-				fileDetail.setFile_size((int)mf.getSize());
-				
-				filesService.insertFileDetail(fileDetail);
-				Logger.info("file_sn ..... " + String.valueOf(file_sn));
-				file_sn++;
-			}				
+			// 파일이 빈 값인 경우 0으로 넘어온다.
+			for (MultipartFile file: fileList) {
+				if (file.getSize() > 0) {
+					String save_name = uploadFile(file);
+					model.addAttribute("save_name", save_name);
+					
+					// 파일 세부 사항
+					fileDetail.setAtch_file_id(atch_file_id);
+					fileDetail.setFile_sn(file_sn);
+					fileDetail.setOri_name(file.getOriginalFilename());
+					fileDetail.setSave_name(save_name);
+					fileDetail.setSave_path(uploadPath);
+					fileDetail.setFile_size((int)file.getSize());
+					
+					filesService.insertFileDetail(fileDetail);
+					Logger.info("file_sn ..... " + String.valueOf(file_sn));
+					file_sn++;
+				}
+			}
 			
 			boardService.write(boardDTO);
 			return "redirect:/boardSearchList"; 
 		}
 	}
 	
-	// 저장 파일명 생성
-	private String uploadFile(MultipartFile file) throws Exception {
-		/* UUID는 유니크한 ID값을 random으로 toString()화 하고 뒤에 오리지널 파일 명과 합침
+	/** 서버에 저장할 파일명 생성
+		* UUID는 유니크한 ID값을 random으로 toString()화 하고 뒤에 오리지널 파일 명과 합침
 		* 장점 : 성능도 괜찮고, 유니크한 ID값을 가질 수있다. 
 		* 단점 : 파일 명이 길어진다.
 		* 서버에 저장된 파일명을 가져와서 uploadPath 경로에 만들고 FileCopyUtils.copy()를 이용해서 쓴다.
 		* MultipartFile의 getBytes() 메서드를 이용하여 target에 데이터를 쓴다.
-		*/
+	 */
+	private String uploadFile(MultipartFile file) throws Exception {
 		String save_name = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 		File target = new File(uploadPath, save_name);
 		FileCopyUtils.copy(file.getBytes(), target);
 		return save_name;
 	}
 	
-	// atch_file_id 생성 : char(25)
+	/** atch_file_id 생성 : char(25) */
 	private String makeAtchFileId() {
 		Random random = new Random();
 		StringBuilder temp = new StringBuilder();
@@ -275,7 +196,7 @@ public class BoardController {
 		return atch_file_id;
 	}
 	
-	// atch_file_id 생성 검증(중복 제거)
+	/** atch_file_id 생성 검증(중복 제거) */
 	private String checkAtchFileId() {
 		List<BoardDTO> list = new ArrayList<>();
 		list = boardService.list();
@@ -294,7 +215,7 @@ public class BoardController {
 		} else return atch_file_id = makeAtchFileId();
 	}
 	
-	// 게시글 수정권한 판단
+	/** 게시글 수정권한 판단 */
 	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.GET)
 	public String boardEdit(@PathVariable int num, Model model, HttpSession session, RedirectAttributes rttr) {
 		if(session.getAttribute("id").equals(boardService.read(num).getId())) {
@@ -311,70 +232,50 @@ public class BoardController {
 		}
 	}
 	
-	// 수정 검증 : BindingResut + Validator
-	// 파일 추가한 경우 or 기존파일 삭제 + 새로운 파일 추가된 경우
+	/** 수정 검증
+	* BindingResut + Validator
+	* 파일 추가 
+	* 게시글에 키값이 '0'인경우 새로운 키 값 생성
+	* 게시글에 키값이 존재하는 경우, 그 키로 물려준다.
+	*/
 	@RequestMapping(value="/boardEdit/{num}", method=RequestMethod.POST)
-	public String boardEdit(@Valid BoardDTO boardDTO, BindingResult bindingResult, MultipartHttpServletRequest mtfRequest, Model model, HttpSession session) throws Exception {
+	public String boardEdit(@Valid BoardDTO boardDTO, @PathVariable int num, BindingResult bindingResult, MultipartHttpServletRequest mtfRequest, Model model, HttpSession session) throws Exception {
 		if(bindingResult.hasErrors()) return "boardEdit";
 		else {
-			// file_sn 키 값 증가를 위한 변수 
-			int file_sn = 0;
-			
-			// uploadFile() : 내가 보낸 파일 명이 아닌, 저장된 시스템 파일명 
-			FileMaster fileMaster = new FileMaster();
 			FileDetail fileDetail = new FileDetail();
 			
-			// 다중 파일이더라도 키값은 하나로 동일하고 file_sn만 따로 주면됨
-			String atch_file_id = checkAtchFileId();
-			
-			// 기존에 존재하던 파일들의 sn값과 키값을 새로 세팅
-			List<FileDetail> fileDetailList = filesService.findFileDetailList(boardDTO.getOldkey());
-			for(FileDetail file : fileDetailList) {
-				file.setOldSn(file.getFile_sn()); // 예전 sn값
-				file.setFile_sn(file_sn); // 새로운 sn값
-				file.setOldKey(boardDTO.getOldkey()); // 예전 키값
-				file.setAtch_file_id(atch_file_id); // 새로운 키값
-				Logger.info("setOldKey : " + file.getOldKey());
-				filesService.detailKeyUpdate(file);
-				file_sn++;
+			// 기존 파일이 없는 경우 file_sn, atch_file_key 설정
+			int file_sn = 0;
+			String atch_file_id = boardService.boardGetKey(num);
+			if(filesService.checkDataToFD(num) != 0)  {
+				file_sn = filesService.getKeyByNum(num).getFile_sn();	
 			}
 			
 			// getFiles안의 키값은 input multiple을 적용한 name값을 적으면 됩니다.
 			// MultipartHttpServletRequest는 방금 업로드한 파일을 가져오는거지, 이미 업로드된 파일을 가져오진 않는다.
 			List<MultipartFile> fileList = mtfRequest.getFiles("file");
 			
-			// FileMaster 키값 설정
-			fileMaster.setAtch_file_id(atch_file_id);
-			filesService.insertFileMaster(fileMaster);
-			
-			for (MultipartFile mf : fileList) {
-				String save_name = uploadFile(mf);
-				model.addAttribute("save_name", save_name);
-				
-				// 파일 세부 사항
-				fileDetail.setAtch_file_id(atch_file_id);
-				fileDetail.setFile_sn(file_sn);
-				fileDetail.setOri_name(mf.getOriginalFilename());
-				fileDetail.setSave_name(save_name);
-				fileDetail.setSave_path(uploadPath);
-				fileDetail.setFile_size((int)mf.getSize());
-				
-				filesService.insertFileDetail(fileDetail);
-				Logger.info("file_sn ..... " + String.valueOf(file_sn));
-				file_sn++;
-			}	
-			
-			// 게시판에 있는 키값 변경
-			filesService.updateBoardKey(fileDetail);
-			
-//			filesService.masterDelete(boardDTO.getOldkey());
+			for (MultipartFile file: fileList) {
+				if (file.getSize() > 0) {
+					// 파일 세부 사항
+					file_sn++;
+					fileDetail.setAtch_file_id(atch_file_id);
+					fileDetail.setFile_sn(file_sn);
+					fileDetail.setOri_name(file.getOriginalFilename());
+					fileDetail.setSave_name(uploadFile(file));
+					fileDetail.setSave_path(uploadPath);
+					fileDetail.setFile_size((int)file.getSize());
+					
+					filesService.insertFileDetail(fileDetail);
+				} else boardDTO.setAtch_file_id(fileDetail.getAtch_file_id());
+			}
 			
 			// 제목 내용 변경
 			boardService.edit(boardDTO);
 			return "redirect:/boardSearchList";
 		}
 	}
-	
+
 	// 게시글 삭제
 	@RequestMapping(value="/boardDelete/{num}", method=RequestMethod.GET)
 	public String boardDelete(@PathVariable int num, Model model, HttpSession session, RedirectAttributes rttr) {

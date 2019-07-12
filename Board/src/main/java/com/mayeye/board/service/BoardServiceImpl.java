@@ -62,13 +62,6 @@ public class BoardServiceImpl implements BoardService {
 	public int countBoardList() {
 		return boardDAO.countBoardList();
 	}
-
-	/* 검색 원본
-	@Override
-	public List<BoardDTO> searchList(String searchOption, String keyword) {
-		return boardDAO.searchList(searchOption, keyword);
-	}
-	*/
 	
 	@Override
 	public List<BoardDTO> searchList(SearchCriteria cri) {
@@ -78,6 +71,11 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public int countArticle(String searchOption, String keyword) {
 		return boardDAO.countArticle(searchOption, keyword);
+	}
+
+	@Override
+	public String boardGetKey(int num) {
+		return boardDAO.boardGetKey(num);
 	}
 
 }
