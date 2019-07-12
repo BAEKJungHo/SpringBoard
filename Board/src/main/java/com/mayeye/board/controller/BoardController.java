@@ -63,6 +63,7 @@ public class BoardController {
 	public String boardSearchList(SearchCriteria cri, Model model) {
 		int count = boardService.countArticle(cri);
 		
+		// 페이지 생성
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
 		pageMaker.setTotalCount(count);
