@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mayeye.board.dto.BoardDTO;
 import com.mayeye.board.dto.FileDetail;
-import com.mayeye.board.service.BoardService;
 import com.mayeye.board.service.FilesService;
 
 @Controller
@@ -31,9 +28,6 @@ public class FileController {
 	
 	@Autowired
 	private FilesService filesService;
-	
-	@Autowired
-	private BoardService boardService;
 	
 	@RequestMapping(value="/fileDownload/{num}/{atch_file_id}/{file_sn}")
 	public void fileDownload(@PathVariable int num, @PathVariable String atch_file_id, @PathVariable int file_sn, 
