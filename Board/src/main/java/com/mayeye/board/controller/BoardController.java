@@ -3,9 +3,7 @@ package com.mayeye.board.controller;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -26,11 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mayeye.board.dto.BoardDTO;
-import com.mayeye.board.dto.Criteria;
 import com.mayeye.board.dto.FileDetail;
 import com.mayeye.board.dto.FileMaster;
 import com.mayeye.board.dto.PageMaker;
